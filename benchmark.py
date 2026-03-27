@@ -1,54 +1,51 @@
-import numpy as np
 import time
+import numpy as np
 
-def run_pnep_benchmark(iterations=100000):
-    """
-    Simulates the Parks-Node Protocol v2.0 calculation cost.
-    This replaces 100,000+ integration steps with a single algebraic functional.
-    """
-    # Mock data for a single 'Node' check
-    sigma_sq = 0.05
-    theta = 0.2
-    beta = 0.05
-    delta_lag = 0.1
-    t = 38.6
-    gamma = 0.01
-    r_count = 12
+def run_pnep_v2_1_benchmark(iterations=100000):
+    # Mock data for a single mirror-symmetry node evaluation
+    # In a real run, these are pulled from the N-body state at dr/dt = 0
+    sigma_sq = 12.5  # High variance = High hierarchy
+    delta_lag = 0.02
+    r_count = 1
+    t = 100
+    
+    # Constants
+    beta = 0.001
+    gamma = 0.05
 
-    start_time = time.time()
+    start_time = time.perf_counter()
     
     for _ in range(iterations):
-        # The PNEP v2.0 Functional
-        phi = 100 * (1 / (1 + sigma_sq)) * np.abs(np.cos(theta)) * np.exp(-beta * delta_lag * t) * (1 - gamma * r_count)
-    
-    end_time = time.time()
-    return end_time - start_time
+        # v2.1 Hierarchy Index (H) Calculation
+        # Normalized 0 to 1 scale
+        h_base = sigma_sq / (1 + sigma_sq)
+        
+        # Temporal Penalties
+        h_final = h_base * (1 - beta * delta_lag * t) * (1 - gamma * r_count)
+        
+        # The v2.1 "Boot Window" Trigger
+        is_ejecting = h_final < 0.5
+        
+    end_time = time.perf_counter()
+    return end_time - start_time, h_final
 
 def simulate_traditional_cost(iterations=100000):
-    """
-    Simulates the overhead of a traditional N-Body ODE solver (DOP853/RK4).
-    Standard solvers must calculate 9 numbers (x,y,z for 3 bodies) + gravity 
-    acceleration thousands of times per orbit.
-    """
-    start_time = time.time()
-    
-    # Simple representation of the compute-heavy gravity loop
+    # Simulates a standard RK4/DOP853 integrator 
+    # calculating forces for every small step in a large window
+    start_time = time.perf_counter()
     for _ in range(iterations):
-        for i in range(3):
-            for j in range(3):
-                if i != j:
-                    # Mock gravity vector calculation (r/d^3)
-                    dist = np.random.rand() + 0.1
-                    force = 1.0 / (dist**3)
-    
-    end_time = time.time()
+        _ = 1 / np.sqrt(np.random.rand(3)**2).sum() # Mock gravity calc
+    end_time = time.perf_counter()
     return end_time - start_time
 
-print("--- PNEP v2.0 Performance Benchmark ---")
-pnep_time = run_pnep_benchmark()
+# Run the Race
+print("--- PNEP v2.1 Performance Benchmark ---")
 trad_time = simulate_traditional_cost()
+pnep_time, last_h = run_pnep_v2_1_benchmark()
 
-print(f"Traditional Solver Simulation: {trad_time:.5f} seconds")
-print(f"PNEP v2.0 Protocol:            {pnep_time:.5f} seconds")
-print(f"\nOptimization Factor: {int(trad_time / pnep_time)}x faster")
+print(f"Traditional Solver (Simulated): {trad_time:.5f}s")
+print(f"PNEP v2.1 Protocol:            {pnep_time:.5f}s")
+print(f"Final Hierarchy Index (H):     {last_h:.3f}")
+print(f"Status: {'[!] ALERT: Ejection Predicted' if last_h < 0.5 else '[+] Stable Hierarchy'}")
+print(f"\nOptimization Factor: {trad_time/pnep_time:.0f}x faster")
 print("---------------------------------------")
