@@ -4,50 +4,55 @@
 
 ![PNEP v2.0 Telemetry Plot: Chaos Tamed](Gemini_Generated_Image_rmga5drmga5drmga.png)
 
-## 🚀 The 10,000x Speedup
+# PNEP: The Parks-Node Ejection Protocol (v2.1)
 
-Traditional N-body solvers (DOP853/RK4) are "blind" integrators that calculate every infinitesimal step in empty space. **PNEP v2.0** is an "aware" state-machine. By shifting from time-stepping to **Event-Driven Geometry**, PNEP reduces computational overhead by over 99.9%.
+> **Dynamic Stability Monitoring for Hierarchical Three-Body Systems via Event-Driven Geometry.**
 
-### The Compute Advantage
+PNEP is a high-efficiency computational framework designed to monitor the stability of hierarchical triple systems. Unlike traditional N-body solvers that perform brute-force integration at every infinitesimal timestep, PNEP utilizes **Sparse Sampling**.
 
-| Metric | Traditional Solver (DOP853) | PNEP Protocol v2.0 |
-| :--- | :--- | :--- |
-| **Method** | Brute-Force Integration ($10^5$ steps) | **Single Algebraic Check** |
-| **Latency** | ~50 milliseconds per orbit | **~5 microseconds** |
-| **Scaling** | Poor ($O(T/\Delta t)$) | **Linear ($O(N_{nodes})$)** |
+By evaluating the system state only at **Mirror Symmetry Nodes**—physically meaningful moments of temporal reflection symmetry where $dr/dt = 0$—PNEP achieves a **~99% reduction in computational overhead**.
 
 ---
 
-## 💎 The Core Logic: Mirror Symmetry Nodes
+## 🚀 Key Discovery: The Hierarchy Index ($H$)
 
-The PNEP shortcut is built on the discovery of **Mirror Symmetry Nodes**. 
+After rigorous validation against the Mardling-Aarseth (MA01) criterion, PNEP identifies a single geometric quantity, the **Hierarchy Index ($H$)**, as a near-perfect discriminator for orbital stability.
 
-* **The Symmetrical Handshake:** At the point of closest approach ($dr/dt = 0$), the three-body system reaches a state of temporal reflection. At this exact node, the physics are identical whether moving forward or backward in time.
-* **Discrete Sampling:** Instead of integrating the "noisy" space between encounters, PNEP only samples the system's "health" at these mirror points.
-
----
-
-## 📐 The Stability Functional: $\Phi(t)$
-
-The PNEP stability index ($\Phi$) monitors the "Gravity Conversations" occurring at these mirror nodes.
-
-$$\Phi(t) = 100 \cdot \left( \frac{1}{1 + \sigma^2(t)} \right) \cdot |\cos(\theta)| \cdot e^{-\beta \cdot \delta_{\text{lag}} \cdot t} \cdot (1 - \gamma \cdot R_{\text{count}})$$
-
-### **Core Components:**
-
-* **Cohesion Buffer ($1 / (1 + \sigma^2)$):** Prevents numerical singularity.
-* **Vector Alignment ($|\cos(\theta)|$):** Projects internal axis onto global trajectory.
-* **Entropy Decay ($e^{-\beta t}$):** Models cumulative information loss.
-* **Resonance Tax ($1 - \gamma R$):** Penalty for near-collision "fatigue."
+* **Stable Hierarchical Triples:** Maintain high distance variance, resulting in $H \approx 0.92$.
+* **Unstable Systems:** Experience a collapse in distance variance during chaos, resulting in $H \approx 0.09$.
+* **The Delta ($\Delta$):** This represents a mean separation of $0.830$ between states.
 
 ---
 
-## 🛠️ Technical Definitions
+## 📐 The v2.1 Stability Functional
 
-* **Cohesion ($\sigma^2$):** $\text{Var}(d_{12}, d_{23}, d_{31})$. 
-* **Alignment Angle ($\theta$):** Angle between the **Encounter Axis** and the **System Velocity Vector**.
-* **Timing Jitter ($\delta_{\text{lag}}$):** Standard deviation of intervals ($\Delta t$) between nodes.
+The refined protocol simplifies the stability check into a single dominant index with light temporal penalties for chaos and resonance:
 
-## 🔴 The Critical Boot Window: 35–55
+$$H(t) = \frac{\sigma^2(t)}{1 + \sigma^2(t)} \times (1 - \beta \cdot \delta_{\text{lag}}(t) \cdot t) \times (1 - \gamma \cdot R_{\text{count}}(t))$$
 
-When $\Phi(t)$ enters the **[35, 55]** range, the system has reached its structural limit. Ejection is imminent.
+### **Core Variables (Evaluated at Nodes Only):**
+
+* **$\sigma^2(t)$ (Hierarchy):** The variance of the three pairwise inter-body distances.
+* **$\delta_{\text{lag}}(t)$ (Jitter):** The timing jitter (standard deviation) of intervals between recent nodes.
+* **$R_{\text{count}}(t)$ (Resonance Tax):** A cumulative count of close encounters modeling "structural fatigue".
+
+---
+
+## 🔴 The Early Warning System: Pre-Ejection Windows
+
+The primary novel contribution of PNEP is its **Predictive Lead-Time**. While static criteria provide a binary label, PNEP issues a dynamic forecast as the system evolves:
+
+* **Success Rate:** In **62.8%** of ejecting systems, PNEP issued a prediction before escape occurred.
+* **Median Precision:** Ejection events are predicted with a lead time of **~30 time units** ($29.8t$ median).
+* **Operational Rule:** When $H(t)$ drops below **0.5**, a "Boot Window" is issued.
+
+---
+
+## 🛠️ Performance Validation
+
+| Metric | Value |
+| :--- | :--- |
+| **Compute Reduction** | **~99%** |
+| **H Separation ($\Delta$)** | **0.830** |
+| **Median Prediction Lead-Time** | **29.8t** |
+| **Ground Truth Validity** | **84–88%** |
