@@ -4,6 +4,11 @@
 
 ![PNEP v2.0 Telemetry Plot: Chaos Tamed](Gemini_Generated_Image_rmga5drmga5drmga.png)
 
+# PNEP v12.0 — Predictive Node Event Protocol
+### World-First High-Fidelity 3-Body Time Forecasting & Indexing
+
+![PNEP v12.0 Breakthrough Infographic](Gemini_Generated_Image_gm8swygm8swygm8s.png)
+
 # PNEP: The Parks-Node Ejection Protocol (v2.1)
 
 > **Dynamic Stability Monitoring for Hierarchical Three-Body Systems via Event-Driven Geometry.**
