@@ -2,7 +2,7 @@
 
 > **Solving the Three-Body Problem with Discrete Symmetry Logic.**
 
-![PNEP v2.0 Telemetry Plot: Chaos Tamed](phi_v2_results.png)
+![PNEP v2.0 Telemetry Plot: Chaos Tamed](Gemini_Generated_Image_rmga5drmga5drmga.png)
 
 ## 🚀 The 10,000x Speedup
 
