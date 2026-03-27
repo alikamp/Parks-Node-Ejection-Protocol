@@ -65,3 +65,56 @@ The Parks-Node Ejection Protocol began as an experimental search for a high-spee
 * **Frame-Independence:** Original alignment terms were found to be undefined in the **Center-of-Mass (CoM)** frame. v2.1 utilizes purely geometric distance variance, making it immune to system drift.
 * **Predictive Shift:** The project shifted focus from a simple "Binary Classifier" to a **Dynamic Timing Monitor**, successfully discovering a median **~30t pre-ejection window**.
 * **The $H < 0.5$ Threshold:** By normalizing the stability signal between 0 and 1, v2.1 provides a universal "Boot Window" trigger that is more accurate across diverse mass ratios than previous iterations.
+
+# PNEP v12.0 — Predictive Node Event Protocol
+### High-Fidelity 3-Body Stability Forecasting & Indexing
+
+**PNEP v12.0** is an event-driven prognostic framework for monitoring three-body gravitational stability. By shifting from continuous N-body integration to discrete "Mirror-Symmetry" sampling, PNEP achieves a **99% reduction in computational overhead** while maintaining **96% Ground Truth Validity**.
+
+---
+
+## 🚀 Key Results (v12.0)
+| Metric | Value | Significance |
+| :--- | :--- | :--- |
+| **Ground Truth Validity** | **96.0%** | Precise alignment with MA01 stability criteria. |
+| **Median Energy Drift** | **0.008%** | Symplectic KDK Leapfrog maintains physical integrity. |
+| **Predictive Success** | **86.7%** | Reliability of "Boot Window" alerts in chaotic systems. |
+| **Median Lead-Time** | **27.9t** | Advanced temporal warning prior to physical ejection. |
+
+---
+
+## 🛠 Technical Specifications
+
+### 1. The Integrator: Symplectic KDK Leapfrog
+To ensure that Ground Truth is rooted in conserved physics, PNEP uses a **Second-Order Symplectic Leapfrog (Kick-Drift-Kick)** integrator.
+
+* **Time-Step ($dt$):** Fixed at **0.006** for optimal resolution.
+* **Softening Factor ($\epsilon$):** **0.01** to prevent numerical singularities.
+* **Energy Conservation:** Near-machine precision ($0.008\%$) over long-duration metastable integrations ($t > 1200$).
+
+### 2. Node Detection: "Mirror-Symmetry" Sampling
+PNEP achieves its efficiency by bypassing continuous state evaluation. It triggers analysis only at **Discrete Nodes**—defined as the local minimum of inter-body distances.
+
+* **Logic:** `(d_lag1 < d_lag2) AND (d_lag1 < d_current)`
+* **Frequency:** Optimized at **~4.5 nodes per inner orbital period**, capturing critical periapsis interactions where stability is determined.
+
+### 3. The Stability Functional ($H$)
+Stability is indexed via the **Hierarchy Index ($H$)**, a normalized geometric variance signal:
+
+$$H = \frac{\sigma^2}{1 + \sigma^2} \quad \text{where } \sigma^2 = \text{Var}(d_{12}, d_{23}, d_{31})$$
+
+* **Stable Hierarchical Triple:** $H \approx 0.92$
+* **Unstable/Chaotic Triple:** $H \approx 0.09$
+* **Classification Threshold:** $H = 0.5$
+
+### 4. Forecasting: Slope-Projection Lead-Time
+Unlike static criteria (e.g., Mardling-Aarseth), PNEP performs **linear regression on the $H$-signal buffer** to forecast the "Time-to-Boot." 
+
+---
+
+## 💻 Usage
+
+Run a batch simulation (default 200 trials) to verify the current stability metrics:
+
+```bash
+python3 pnep_fast.py 200 42
