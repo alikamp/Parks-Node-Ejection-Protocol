@@ -15,7 +15,8 @@ Traditional N-body solvers (RK4, DOP853) calculate every infinitesimal step in e
 | **Compute Savings** | 0% (Baseline) | **99.9% - 99.99%** |
 
 ## 📐 The Core Equation: $\Phi(t)$
-The Stability Index ($\Phi$) predicts system failure by monitoring "Gravity Conversations":
+The Stability Index ($\Phi$) predicts system failure by monitoring "Gravity Conversations":<img width="1408" height="768" alt="Gemini_Generated_Image_u87ewnu87ewnu87e" src="https://github.com/user-attachments/assets/c5e7de6b-f7b6-44ac-99f7-9344c599db63" />
+
 
 $$\Phi(t) = \alpha(t) \cdot N_{\text{sym}}(t) \times (1 - \beta \cdot \delta_{\text{lag}}(t) \cdot t) \times (1 + \gamma \cdot R_{\text{count}}(t))$$
 
