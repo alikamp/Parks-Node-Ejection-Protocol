@@ -20,6 +20,8 @@ The PNEP stability index ($\Phi$) treats the Three-Body Problem as a normalized 
 
 $$\Phi(t) = 100 \cdot \left( \frac{1}{1 + \sigma^2(t)} \right) \cdot |\cos(\theta)| \cdot e^{-\beta \cdot \delta_{\text{lag}} \cdot t} \cdot (1 - \gamma \cdot R_{\text{count}})$$
 
+## Technical Definitions & VariablesTo ensure reproducibility, PNEP v2.0 defines its functional variables based on the state vectors of a three-body system $(m_1, m_2, m_3)$ at any given node $n$:Cohesion ($\sigma^2$): The geometric variance of the scalar distances between the three bodies.$$\sigma^2 = \text{Var}(d_{12}, d_{23}, d_{31})$$When $\sigma^2 \to 0$, the system is in a near-perfect equilateral configuration (Lagrange point L4/L5 simulation).Alignment Angle ($\theta$): The angle between the Encounter Axis (the vector connecting the two closest bodies) and the System Velocity Vector ($\vec{V}_{sys}$).$\alpha = |\cos(\theta)|$ measures how much internal kinetic energy is being "shunted" into the system's global trajectory.Timing Jitter ($\delta_{\text{lag}}$): The standard deviation of the time-intervals $(\Delta t)$ between the last 5 symmetrical nodes.High jitter indicates the breakdown of orbital periodicity and the onset of stochastic chaos.Resonance Drain ($\gamma$): A scaling constant (default $= 0.01$) that models the "structural fatigue" of the gravitational bond after repeated near-misses.
+
 ### **Core Components:**
 * **Cohesion Buffer ($1 / (1 + \sigma^2)$):** Prevents numerical singularity during close encounters by normalizing the geometric variance of the three bodies.
 * **Vector Alignment ($|\cos(\theta)|$):** Projects the internal encounter axis onto the system's global trajectory (Alignment Factor $\alpha$).
