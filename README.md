@@ -56,3 +56,12 @@ The primary novel contribution of PNEP is its **Predictive Lead-Time**. While st
 | **H Separation ($\Delta$)** | **0.830** |
 | **Median Prediction Lead-Time** | **29.8t** |
 | **Ground Truth Validity** | **84–88%** |
+
+## 📜 Project Evolution: From v1.0 to v2.1
+
+The Parks-Node Ejection Protocol began as an experimental search for a high-speed, event-driven stability functional. Through extensive validation against the **Mardling-Aarseth (MA01)** criterion and long-term N-body simulations, several key theoretical corrections were made to reach the current robust state:
+
+* **The Hierarchy Inversion:** Early versions used a "Cohesion" term that anticorrelated with stability. v2.1 inverts this into the **Hierarchy Index ($H$)**, correctly identifying that large orbital separation ($\sigma^2$) is the primary signature of a bound triple.
+* **Frame-Independence:** Original alignment terms were found to be undefined in the **Center-of-Mass (CoM)** frame. v2.1 utilizes purely geometric distance variance, making it immune to system drift.
+* **Predictive Shift:** The project shifted focus from a simple "Binary Classifier" to a **Dynamic Timing Monitor**, successfully discovering a median **~30t pre-ejection window**.
+* **The $H < 0.5$ Threshold:** By normalizing the stability signal between 0 and 1, v2.1 provides a universal "Boot Window" trigger that is more accurate across diverse mass ratios than previous iterations.
