@@ -129,5 +129,5 @@ Mardling, R. A. & Aarseth, S. J. (2001). Tidal interactions in star cluster simu
 
 ## Author
 
-Ali Kamp — independent researcher  
+Alika Parks, alikamp@gmail.com — independent researcher  
 https://github.com/alikamp/Parks-Node-Ejection-Protocol
