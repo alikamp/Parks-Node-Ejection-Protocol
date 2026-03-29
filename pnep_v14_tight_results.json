@@ -1,0 +1,18 @@
+{
+  "topology": "2+2",
+  "n": 120,
+  "skipped": 0,
+  "TP": 60,
+  "FP": 0,
+  "FN": 1,
+  "TN": 59,
+  "acc": 99.2,
+  "spec": 100.0,
+  "sens": 98.4,
+  "H_sep": 0.4112,
+  "R_sep": 10.22,
+  "pre_pct": 93.2,
+  "med_win": 2.1,
+  "stable_ratio_threshold": 8.0,
+  "unstable_ratio_threshold": 1.3
+}
