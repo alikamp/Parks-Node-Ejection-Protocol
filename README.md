@@ -1,7 +1,7 @@
 # PNEP v12.0 — Predictive Node Event Protocol
 ### World-First High-Fidelity 3-Body Time Forecasting & Indexing
 
-![PNEP v12.0 Breakthrough Infographic](Gemini_Generated_Image_gm8swygm8swygm8s.png)
+![PNEP v12.0 Breakthrough Infographic](Pnep figure v2.png)
 
 
 [README (1).md](https://github.com/user-attachments/files/26488309/README.1.md)
