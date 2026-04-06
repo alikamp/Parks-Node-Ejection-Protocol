@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parks Node Ejection Protocol — Interactive Framework Overview</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f0;
+    --bg3: #eeece7;
+    --text: #1a1a18;
+    --text2: #5a5a55;
+    --text3: #8a8a83;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --info-bg: #e6f1fb;
+    --info: #185fa5;
+    --success-bg: #eaf3de;
+    --success: #3b6d11;
+    --warn-bg: #faeeda;
+    --warn: #854f0b;
+    --danger-bg: #fcebeb;
+    --danger: #a32d2d;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --mono: 'SF Mono', 'Fira Mono', 'Cascadia Code', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18;
+      --bg2: #242420;
+      --bg3: #2e2e2a;
+      --text: #e8e6df;
+      --text2: #a8a69f;
+      --text3: #6a6a63;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.2);
+      --info-bg: #042c53;
+      --info: #85b7eb;
+      --success-bg: #173404;
+      --success: #97c459;
+      --warn-bg: #412402;
+      --warn: #ef9f27;
+      --danger-bg: #501313;
+      --danger: #f09595;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .page { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  header { padding: 2rem 0 1.5rem; border-bottom: 0.5px solid var(--border); margin-bottom: 1.5rem; }
+  .header-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.5rem; }
+  h1 { font-size: 28px; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+  .header-sub { font-size: 15px; color: var(--text2); }
+  .header-meta { margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--text3); }
+  .meta-item a { color: var(--info); text-decoration: none; }
+  .meta-item a:hover { text-decoration: underline; }
+
+  .nav-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .pill {
+    padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 400;
+    cursor: pointer; border: 0.5px solid var(--border2);
+    background: transparent; color: var(--text2);
+    transition: all 0.15s; font-family: var(--sans);
+  }
+  .pill:hover { background: var(--bg2); color: var(--text); }
+  .pill.active { background: var(--info-bg); color: var(--info); border-color: transparent; font-weight: 500; }
+
+  .panel { display: none; animation: fadein 0.18s ease; }
+  .panel.active { display: block; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.4rem; }
+  .section-title { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 0.5rem; }
+  .section-body { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; }
+
+  .card {
+    background: var(--bg2); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1rem 1.2rem;
+  }
+  .card + .card { margin-top: 10px; }
+  .card-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 6px; }
+  .card-value { font-size: 26px; font-weight: 500; color: var(--text); }
+  .card-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1rem 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1rem 0; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 1rem 0; }
+  @media (max-width: 600px) {
+    .grid2, .grid3, .grid4 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 420px) {
+    .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+  }
+
+  .formula-box {
+    background: var(--bg2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.2rem;
+    font-family: var(--mono); font-size: 15px; color: var(--text);
+    text-align: center; margin: 1rem 0;
+  }
+  .formula-label { font-family: var(--sans); font-size: 12px; color: var(--text3); margin-bottom: 6px; text-align: left; }
+
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: var(--radius); margin-right: 5px; margin-bottom: 4px;
+  }
+  .tag-blue { background: var(--info-bg); color: var(--info); }
+  .tag-green { background: var(--success-bg); color: var(--success); }
+  .tag-warn { background: var(--warn-bg); color: var(--warn); }
+  .tag-red { background: var(--danger-bg); color: var(--danger); }
+
+  .h-track { height: 10px; background: var(--bg3); border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
+  .h-fill { height: 100%; border-radius: 5px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+  .h-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
+
+  .regime-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 0.5px solid var(--border);
+  }
+  .regime-row:last-child { border-bottom: none; }
+  .regime-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .regime-name { font-size: 14px; font-weight: 500; color: var(--text); min-width: 130px; }
+  .regime-desc { font-size: 13px; color: var(--text2); flex: 1; line-height: 1.5; }
+  .regime-lead { font-size: 13px; font-weight: 500; color: var(--text3); white-space: nowrap; }
+
+  .step-row { display: flex; gap: 10px; margin: 8px 0; align-items: flex-start; }
+  .step-num {
+    min-width: 24px; height: 24px; border-radius: 50%;
+    background: var(--info-bg); color: var(--info);
+    font-size: 12px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+  .step-text strong { color: var(--text); font-weight: 500; }
+
+  .canvas-wrap { position: relative; width: 100%; height: 160px; margin: 1rem 0; border-radius: var(--radius); overflow: hidden; }
+  #regimeCanvas { width: 100%; height: 100%; display: block; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin: 1rem 0; }
+  .stat-item { background: var(--bg2); border-radius: var(--radius); padding: 0.75rem; border: 0.5px solid var(--border); }
+  .stat-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .stat-val { font-size: 17px; font-weight: 500; color: var(--text); }
+
+  .freq-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem; margin-bottom: 10px; }
+  .freq-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .freq-val { font-family: var(--mono); font-size: 13px; color: var(--info); }
+  .freq-desc { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+
+  .burrau-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 1rem 0; }
+  @media (max-width: 500px) { .burrau-grid { grid-template-columns: repeat(3,1fr); } }
+
+  footer {
+    margin-top: 3rem; padding-top: 1.5rem;
+    border-top: 0.5px solid var(--border);
+    font-size: 13px; color: var(--text3);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer a { color: var(--info); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="header-label">Independent research · March 2026</div>
+  <h1>Parks Node Ejection Protocol</h1>
+  <div class="header-sub">A unified geometric framework for gravitational hierarchy decay</div>
+  <div class="header-meta">
+    <div class="meta-item">Alika M. Parks &nbsp;·&nbsp; <a href="mailto:alikamp@gmail.com">alikamp@gmail.com</a></div>
+    <div class="meta-item"><a href="https://github.com/alikamp/Parks-Node-Ejection-Protocol" target="_blank">github.com/alikamp/Parks-Node-Ejection-Protocol</a></div>
+  </div>
+</header>
+
+<div class="nav-pills">
+  <button class="pill active" onclick="show('insight',this)">Core insight</button>
+  <button class="pill" onclick="show('formula',this)">H formula</button>
+  <button class="pill" onclick="show('regimes',this)">3 decay regimes</button>
+  <button class="pill" onclick="show('topologies',this)">Topologies</button>
+  <button class="pill" onclick="show('signals',this)">Pre-ejection signals</button>
+  <button class="pill" onclick="show('breathing',this)">Nodal breathing</button>
+  <button class="pill" onclick="show('results',this)">Results</button>
+</div>
+
+<!-- CORE INSIGHT -->
+<div id="insight" class="panel active">
+  <div class="section-label">The problem</div>
+  <div class="section-title">Chaos in trajectories, order at the nodes</div>
+  <div class="section-body">Poincaré proved in 1890 that the trajectories of three gravitating bodies are fundamentally chaotic. Every prior method either works around this or fights through it. PNEP works <em>through</em> it by finding the moments where the chaos goes quiet.</div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-label">Prior methods</div>
+      <div style="margin-top:8px">
+        <div style="margin-bottom:8px"><span class="tag tag-warn">MA01 / Static</span><br><span style="font-size:13px;color:var(--text2)">Binary yes/no from initial conditions. No timing. No identity. Never updates.</span></div>
+        <div><span class="tag tag-warn">ML classifiers</span><br><span style="font-size:13px;color:var(--text2)">Trained on labelled systems. Still static. Cannot forecast timing or identity.</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">PNEP</div>
+      <div style="margin-top:8px">
+        <div style="margin-bottom:8px"><span class="tag tag-green">Event-driven</span><br><span style="font-size:13px;color:var(--text2)">Samples only at mirror symmetry nodes. Updates in real time during integration.</span></div>
+        <div><span class="tag tag-green">Dynamic</span><br><span style="font-size:13px;color:var(--text2)">Issues pre-ejection warnings, identifies escaping body, detects regime.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="card-label">What is a mirror symmetry node?</div>
+    <div class="section-body" style="margin:8px 0 0;font-size:14px">The instant when any pair of bodies reaches closest approach and radial velocity vanishes (dr/dt&nbsp;=&nbsp;0). At this moment the system achieves temporal reflection symmetry — the configuration is identical whether time runs forward or backward. The hierarchy is maximally legible. We call these moments <strong>geometrically honest</strong>.</div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">Compute advantage</div>
+    <div style="font-size:14px;color:var(--text2);margin-top:6px">PNEP evaluates H only at nodes — typically tens to hundreds per system rather than millions of timesteps. Computational overhead is approximately <strong style="color:var(--text)">1%</strong> of full N-body evaluation. For a survey of 10,000 systems: hours not months.</div>
+  </div>
+</div>
+
+<!-- H FORMULA -->
+<div id="formula" class="panel">
+  <div class="section-label">The hierarchy index</div>
+  <div class="section-title">One scalar. No training data. No frame dependence.</div>
+  <div class="section-body">At each mirror symmetry node, a single number is computed from the variance of pairwise distances. That number encodes whether the system is hierarchically intact or geometrically scrambled.</div>
+
+  <div class="formula-box">
+    <div class="formula-label">The hierarchy index H</div>
+    H = σ² / (1 + σ²) &nbsp;&nbsp; where &nbsp;&nbsp; σ² = Var(d₁₂, d₂₃, d₃₁)
+  </div>
+
+  <div style="margin:1rem 0">
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px">
+      <span>Stable system — inner binary dominates, distances unequal, high variance</span>
+      <strong style="color:var(--text)">H = 0.83</strong>
+    </div>
+    <div class="h-track"><div class="h-fill" style="width:83%;background:#378add"></div></div>
+
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin:12px 0 6px">
+      <span>Unstable system — bodies exchange partners, distances equalise, low variance</span>
+      <strong style="color:var(--text)">H = 0.09</strong>
+    </div>
+    <div class="h-track"><div class="h-fill" style="width:9%;background:#d85a30"></div></div>
+    <div class="h-labels"><span>H = 0 (chaotic)</span><span>Classification threshold H = 0.50</span><span>H = 1 (stable)</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-label">Why it works</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6">In a stable triple at a node: one small distance (inner binary at periapsis) + two large distances (outer body far away) = high variance = H → 1. In chaos: all three distances comparable = low variance = H → 0. This is not empirical — it is geometric inevitability.</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Frame-dependence correction</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6">Early versions included an alignment angle term. In the CoM frame, bulk velocity is exactly zero — the term measured floating-point noise. Removing it and using pure distance variance was the decisive step achieving 100% ground truth validity.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">Separation between populations</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px">
+      <div><div style="font-size:11px;color:var(--text3)">Stable mean H</div><div style="font-size:20px;font-weight:500;color:#378add">0.827</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">Unstable mean H</div><div style="font-size:20px;font-weight:500;color:#d85a30">0.091</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">Separation Δ</div><div style="font-size:20px;font-weight:500;color:var(--text)">0.736</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3 DECAY REGIMES -->
+<div id="regimes" class="panel">
+  <div class="section-label">Decay regimes</div>
+  <div class="section-title">Three distinct signatures. Same scalar H.</div>
+  <div class="section-body">The slope, variance, and temporal behaviour of H at consecutive nodes identifies which of three regimes the system occupies — each with its own pre-ejection forecasting method.</div>
+
+  <div class="card">
+    <div class="regime-row">
+      <div class="regime-dot" style="background:#378add"></div>
+      <div>
+        <div class="regime-name">Regime 1 — Stable</div>
+        <div class="regime-desc">H flat near 0.83 at every node indefinitely. dH/dn ≈ 0. Signal does not waver across thousands of measurements. Zero false positives.</div>
+      </div>
+      <div class="regime-lead">∞ lead</div>
+    </div>
+    <div class="regime-row">
+      <div class="regime-dot" style="background:#ef9f27"></div>
+      <div>
+        <div class="regime-name">Regime 2 — Slow decay</div>
+        <div class="regime-desc">H erodes at dH/dn ≈ +0.0012/node over 500–3000t. Geometric divorce. Outer body incrementally absorbs energy from inner binary. Linear extrapolation forecasts ejection hundreds of time units in advance.</div>
+      </div>
+      <div class="regime-lead">412.6t median</div>
+    </div>
+    <div class="regime-row">
+      <div class="regime-dot" style="background:#d85a30"></div>
+      <div>
+        <div class="regime-name">Regime 3 — Flash ejection</div>
+        <div class="regime-desc">H scrambles in [0.05–0.30], then spikes above 0.50 and stays. That spike is the warning. Validated on Burrau's Pythagorean Problem.</div>
+      </div>
+      <div class="regime-lead">2–10t lead</div>
+    </div>
+  </div>
+
+  <div class="formula-box" style="text-align:left;font-size:13px;margin-top:12px">
+    <div class="formula-label">Slow-decay ejection forecast formula</div>
+    Δt_ejection ≈ (H_target − H_current) / (dH/dn) × mean_Δt_node
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="regimeCanvas"></canvas>
+  </div>
+  <div style="display:flex;gap:16px;font-size:12px;color:var(--text3);margin-top:4px">
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#378add;display:inline-block;border-radius:2px"></span>Stable</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#ef9f27;display:inline-block;border-radius:2px"></span>Slow decay</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#d85a30;display:inline-block;border-radius:2px"></span>Flash ejection</span>
+  </div>
+</div>
+
+<!-- TOPOLOGIES -->
+<div id="topologies" class="panel">
+  <div class="section-label">The unified law</div>
+  <div class="section-title">Same formula. Three topologies. Polarity inverts.</div>
+  <div class="section-body">The most compelling evidence for universality: the 3+1 topology produces an inverted polarity — stable = low H_inner. A coincidental signal would break under topology change. A geometric law reveals itself differently but holds universally.</div>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-label">3-body hierarchical triple</div>
+      <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Signal: H of all 3 pairs</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Stable polarity: <strong style="color:var(--text)">high H</strong></div>
+      <div style="font-size:26px;font-weight:500;color:#378add">92.0%</div>
+      <div style="font-size:11px;color:var(--text3)">100% specificity · 0 false positives</div>
+    </div>
+    <div class="card">
+      <div class="card-label">3+1 hierarchical quadruple</div>
+      <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Signal: H_inner of inner triple</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Stable polarity: <strong style="color:var(--text)">low H_inner ↕</strong></div>
+      <div style="font-size:26px;font-weight:500;color:#1d9e75">93.5%</div>
+      <div style="font-size:11px;color:var(--text3)">78.9t median lead time</div>
+    </div>
+    <div class="card">
+      <div class="card-label">2+2 peer binary quadruple</div>
+      <div style="font-size:11px;color:var(--text3);margin:4px 0 2px">Signal: R × H combined</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Stable polarity: <strong style="color:var(--text)">high R×H</strong></div>
+      <div style="font-size:26px;font-weight:500;color:#1d9e75">99.2%</div>
+      <div style="font-size:11px;color:var(--text3)">100% specificity</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:4px">
+    <div class="card-label">Burrau's Pythagorean problem — canonical benchmark</div>
+    <div class="burrau-grid" style="margin-top:10px">
+      <div class="stat-item"><div class="stat-label">Masses</div><div class="stat-val">3 : 4 : 5</div></div>
+      <div class="stat-item"><div class="stat-label">H scramble zone</div><div class="stat-val">0.11–0.28</div></div>
+      <div class="stat-item"><div class="stat-label">H-spike detected</div><div class="stat-val">t = 58.4</div></div>
+      <div class="stat-item"><div class="stat-label">Physical ejection</div><div class="stat-val">t = 63.1</div></div>
+      <div class="stat-item"><div class="stat-label">Body predicted</div><div class="stat-val" style="color:#378add">Mass 3 ✓</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px">Lead time 4.7t · Energy drift 0.004% · Lightest body correctly identified via velocity geometry, not mass statistics.</div>
+  </div>
+</div>
+
+<!-- PRE-EJECTION SIGNALS -->
+<div id="signals" class="panel">
+  <div class="section-label">Pre-ejection signals</div>
+  <div class="section-title">Two novel signals. Both identify the escaping body.</div>
+  <div class="section-body">Beyond the H slope forecast, two independent signals fire before ejection — each providing advance warning and each identifying the escaping body through geometry alone.</div>
+
+  <div class="card">
+    <div class="card-label">Liberation energy signature — gravitational analogue of atomic ionisation</div>
+    <div class="step-row" style="margin-top:10px">
+      <div class="step-num">1</div>
+      <div class="step-text">Inner binary acts as <strong>gravitational energy engine</strong> — transfers energy to outer body through repeated close approaches over hundreds of orbital periods</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-text">At liberation threshold: outer body briefly <strong>circularises its orbit</strong> (mean eccentricity at anomaly = 0.124) — genuinely near-circular amid otherwise highly elliptical chaotic orbits</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-text">Eccentricity grows monotonically toward 1.0 and escape. <strong>Point of no return crossed.</strong> The body tracing this liberation orbit is the ejecting body.</div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="stat-item"><div class="stat-label">Coverage</div><div class="stat-val" style="color:#378add">100%</div></div>
+      <div class="stat-item"><div class="stat-label">Median lead</div><div class="stat-val">26.2t</div></div>
+      <div class="stat-item"><div class="stat-label">Max lead</div><div class="stat-val">167.5t</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">H-spike velocity trigger (flash regime)</div>
+    <div style="font-size:14px;color:var(--text2);margin-top:8px;line-height:1.6">At the moment of H-spike, the body with the highest relative velocity from the system CoM is the escaping body. Reads velocity geometry — not mass ordering. Validated on Burrau: correctly identifies mass 3 (the lightest) through geometric evidence alone.</div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">Node geometry directional signal</div>
+    <div style="font-size:14px;color:var(--text2);margin-top:8px;line-height:1.6">In the final nodes before ejection, one body's pairwise distances grow consistently while others remain stable. The confidence score — slope of the growing distance pair — correctly identifies the ejecting body in 100% of high-confidence cases (confidence > 0.5).</div>
+  </div>
+
+  <div style="margin-top:12px;padding:12px;background:var(--success-bg);border-radius:var(--radius);font-size:13px;color:var(--success)">
+    All three identity signals are independent. They converge on the same body through geometry alone, regardless of mass ordering.
+  </div>
+</div>
+
+<!-- NODAL BREATHING -->
+<div id="breathing" class="panel">
+  <div class="section-label">Nodal breathing — new discovery</div>
+  <div class="section-title">The earliest warning signal in the framework.</div>
+  <div class="section-body">Before H shows any decay, the inter-node time interval begins rhythmic oscillation. This is Nodal Breathing — the outer orbital period approaching resonance with the inner binary period. It fires thousands of time units before ejection while H looks perfectly flat.</div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-label">Validated result (v15.1)</div>
+      <div class="grid2" style="margin-top:8px;gap:8px">
+        <div class="stat-item"><div class="stat-label">Alert fired</div><div class="stat-val">t = 17.44</div></div>
+        <div class="stat-item"><div class="stat-label">H at alert</div><div class="stat-val">0.857</div></div>
+        <div class="stat-item"><div class="stat-label">Jitter J</div><div class="stat-val" style="color:#d85a30">0.611</div></div>
+        <div class="stat-item"><div class="stat-label">Projected lead</div><div class="stat-val">~4000t</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text3)">H is visually flat at alert time. No visible decay. Every prior method: stable. Nodal Breathing: marginal.</div>
+    </div>
+    <div class="card">
+      <div class="card-label">The jitter metric J</div>
+      <div class="formula-box" style="font-size:13px;margin:8px 0;text-align:left">
+        <div class="formula-label">12-node rolling window</div>
+        J = σ(Δt_node) / mean(Δt_node)
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.5">Alert threshold: J > 0.02. Physical interpretation: outer orbital period approaching rational ratio with inner binary period. Beat frequency = breathing frequency.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">Three nested frequency layers — discovered in simulation</div>
+    <div class="freq-card" style="margin-top:10px;background:var(--bg3)">
+      <div class="freq-name">Layer 1 — Breathing carrier</div>
+      <div class="freq-val">f_B ≈ 0.352 nodes⁻¹ · period ≈ 2.8 nodes</div>
+      <div class="freq-desc">Beat between inner and outer orbital frequencies. Dominant and clean across all tested systems. The resonance carrier wave.</div>
+    </div>
+    <div class="freq-card" style="background:var(--bg3)">
+      <div class="freq-name">Layer 2 — Envelope sub-frequency</div>
+      <div class="freq-val">f_env ≈ 0.027 nodes⁻¹ · period ≈ 36 nodes</div>
+      <div class="freq-desc">Amplitude modulation of the breathing oscillation — nested within the carrier. Analogous to AM radio: ejection timing encoded in the envelope, not the carrier.</div>
+    </div>
+    <div class="freq-card" style="margin-bottom:0;background:var(--bg3)">
+      <div class="freq-name">Layer 3 — Ejection timing</div>
+      <div class="freq-val">t_ejection ≈ k × T_env</div>
+      <div class="freq-desc">Two sub-regimes found: <strong>Type A</strong> (k ≈ 1.0–1.2) — ejection within one envelope period. <strong>Type B</strong> (k ≈ 2–4) — ejection after several envelope cycles. Strongest case: a_out=4.5, T_env = 1872t, t_eject = 1898t, ratio = 1.014.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="panel">
+  <div class="section-label">Validated results</div>
+  <div class="section-title">407 systems. Three topologies. Zero false positives on stable.</div>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-label">3-body (n=87, seed 42)</div>
+      <div class="card-value">92.0%</div>
+      <div class="card-sub">100% specificity · 0 FP · 20.9t lead · F1 93.5%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">3+1 quadruple (n=200)</div>
+      <div class="card-value">93.5%</div>
+      <div class="card-sub">92.2% specificity · 78.9t lead · F1 93.5%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">2+2 peer binary (n=120)</div>
+      <div class="card-value">99.2%</div>
+      <div class="card-sub">100% specificity · 2.1t lead · F1 99.2%</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:4px">
+    <div class="card">
+      <div class="card-label">Compute cost</div>
+      <div class="card-value">~1%</div>
+      <div class="card-sub">of full N-body evaluation. O(1) per node. Tens to hundreds of evaluations vs millions of timesteps.</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Energy conservation</div>
+      <div class="card-value">0.0068%</div>
+      <div class="card-sub">Median energy drift. Symplectic KDK leapfrog. Near-machine-precision across long-duration integrations.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">Pre-ejection signal summary</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
+      <div class="stat-item"><div class="stat-label">H-slope coverage</div><div class="stat-val">100%</div><div style="font-size:11px;color:var(--text3)">Slow decay regime</div></div>
+      <div class="stat-item"><div class="stat-label">Liberation sig. coverage</div><div class="stat-val">100%</div><div style="font-size:11px;color:var(--text3)">All ejecting systems</div></div>
+      <div class="stat-item"><div class="stat-label">Nodal breathing lead</div><div class="stat-val">~4000t</div><div style="font-size:11px;color:var(--text3)">Marginal systems</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-label">Open source — NumPy only, no external dependencies</div>
+    <div style="font-size:14px;color:var(--text2);margin-top:6px">Full code, results JSON, validated batch data, and figures at:<br>
+    <a href="https://github.com/alikamp/Parks-Node-Ejection-Protocol" target="_blank" style="color:var(--info);font-family:var(--mono);font-size:13px">github.com/alikamp/Parks-Node-Ejection-Protocol</a></div>
+  </div>
+</div>
+
+<footer>
+  <span>Alika M. Parks · Independent Researcher · 2026</span>
+  <span><a href="https://github.com/alikamp/Parks-Node-Ejection-Protocol" target="_blank">GitHub</a> &nbsp;·&nbsp; <a href="mailto:alikamp@gmail.com">alikamp@gmail.com</a></span>
+</footer>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  drawRegimeCanvas();
+}
+
+function drawRegimeCanvas() {
+  const canvas = document.getElementById('regimeCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth, H = 160;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const gridCol = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+  const textCol = isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)';
+  const bg = isDark ? '#242420' : '#f5f4f0';
+
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle = gridCol; ctx.lineWidth = 0.5;
+  [0.25,0.5,0.75].forEach(y => {
+    ctx.beginPath(); ctx.moveTo(40,y*H); ctx.lineTo(W-10,y*H); ctx.stroke();
+  });
+
+  ctx.setLineDash([4,4]); ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'; ctx.lineWidth=0.8;
+  ctx.beginPath(); ctx.moveTo(40,H*0.5); ctx.lineTo(W-10,H*0.5); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = textCol; ctx.font = '10px '+getComputedStyle(document.body).fontFamily;
+  ctx.fillText('H = 0.50', 44, H*0.5 - 4);
+  ctx.fillText('nodes →', W-55, H-4);
+
+  const N = 220;
+  function drawLine(color, genFn) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    for (let i=0;i<N;i++) {
+      const x = 40+(i/(N-1))*(W-55);
+      const y = H - genFn(i/N)*H*0.82 - H*0.08;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  const rng = mulberry32(42);
+  drawLine('#378add', t => 0.83+(rng()-0.5)*0.025);
+  drawLine('#ef9f27', t => Math.max(0.02, 0.82-t*0.38+(rng()-0.5)*0.035));
+  drawLine('#d85a30', t => t<0.72
+    ? 0.09+Math.abs(Math.sin(t*38))*0.17+(rng()-0.5)*0.04
+    : Math.min(0.92, 0.09+(t-0.72)*3.0));
+}
+
+function mulberry32(seed) {
+  let s = seed;
+  return function() {
+    s |= 0; s = s + 0x6D2B79F5 | 0;
+    let z = Math.imul(s ^ s >>> 15, 1 | s);
+    z ^= z + Math.imul(z ^ z >>> 7, 61 | z);
+    return ((z ^ z >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+window.addEventListener('load', drawRegimeCanvas);
+window.addEventListener('resize', drawRegimeCanvas);
+</script>
+</body>
+</html>
