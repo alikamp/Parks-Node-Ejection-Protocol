@@ -1,3 +1,6 @@
+## Interactive Overview
+👉 [Parks Node Ejection Protocol — Framework Overview](https://alikamp.github.io/Parks-Node-Ejection-Protocol/)
+
 # Order at the Nodes: The Parks Unified Law of Gravitational Hierarchy Decay
 
 **Alika M. Parks — Independent Researcher**
