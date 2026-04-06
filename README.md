@@ -1,3 +1,7 @@
+## Interactive Overview
+👉 [Parks Node Ejection Protocol — Framework Overview](https://alikamp.github.io/Parks-Node-Ejection-Protocol/)
+
+
 # PNEP v12.0 — Predictive Node Event Protocol
 ### World-First High-Fidelity 3-Body Time Forecasting & Indexing
 
