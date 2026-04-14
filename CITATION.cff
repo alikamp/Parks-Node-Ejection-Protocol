@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use this framework, please cite it as below."
+type: software
+title: "Parks Node Ejection Protocol (PNEP)"
+abstract: >
+  A real-time geometric framework for predicting stability, ejection timing,
+  decay regime, and escaping body identity in hierarchical gravitational
+  N-body systems. The Hierarchy Index H = sigma^2/(1+sigma^2), sampled at
+  mirror symmetry nodes, classifies stable and unstable configurations with
+  zero false positives across three tested topologies. Includes the Liberation
+  Energy Signature and Nodal Breathing pre-ejection signals.
+authors:
+  - family-names: Parks
+    given-names: Alika M.
+    email: alikamp@gmail.com
+    orcid: "https://orcid.org/0009-0002-8191-5482"
+    affiliation: "Independent Researcher"
+version: "1.0.0"
+date-released: "2026-04-08"
+license: CC-BY-4.0
+repository-code: "https://github.com/alikamp/Parks-Node-Ejection-Protocol"
+url: "https://alikamp.github.io/Parks-Node-Ejection-Protocol"
+doi: "10.5281/zenodo.19548289"
+keywords:
+  - three-body problem
+  - N-body dynamics
+  - hierarchical triples
+  - gravitational stability
+  - orbital mechanics
+  - mirror symmetry nodes
+  - ejection prediction
+  - nodal breathing
+  - celestial mechanics
+  - chaos
+preferred-citation:
+  type: article
+  title: "Order at the Nodes: A Unified Geometric Law for Gravitational Hierarchy Decay"
+  authors:
+    - family-names: Parks
+      given-names: Alika M.
+      email: alikamp@gmail.com
+      orcid: "https://orcid.org/0009-0002-8191-5482"
+      affiliation: "Independent Researcher"
+  year: 2026
+  month: 4
+  journal: "Monthly Notices of the Royal Astronomical Society"
+  notes: "Submitted April 2026, manuscript MN-26-1059-P"
+  doi: "10.5281/zenodo.19548289"
+  url: "https://alikamp.github.io/Parks-Node-Ejection-Protocol"
