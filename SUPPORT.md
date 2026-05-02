@@ -18,12 +18,18 @@ In a 2019 accelerator interview — me on one end, four of them on the other —
 
 Neither panned out. So I kept building.
 
-In early 2026 I taught myself orbital mechanics, wrote my own gravitational integrator, and discovered a geometric regularity in few-body dynamics that no one had published before. Extended the same principle to cosmological scales and found a signal in real Planck satellite data that domain experts called "very nice and consistent." Then applied it to fluid dynamics and demonstrated 37× computational speedup with preserved physics.
+My first battery of books ever read as a teenager was about the wonders of the cosmos, leaned into that once again- wrote my own gravitational integrator, and discovered a geometric regularity in few-body dynamics that no one had published before. With momentum turned my gaze to cosmological scales and found a signal in real Planck satellite data that domain experts called "very nice and consistent." Then flowed to fluid dynamics and demonstrated 37× computational speedup with preserved physics.
 
-Three fields. Three results. One principle. From a laptop in Kauai.
+Three fields. Three results. From a laptop in the Central Pacific. 
 
-I'm working toward financial stability, a foot in the door at a research institution, and maybe starting a family. Every dollar helps me keep doing this work.
+Any dollars are appreciated or drop me a note-alikamp@gmail.com, Id be curious to know how your using it.
+
+
 
 ---
 
-**Venmo:** `@alika-p`
+**Venmo:** @alika-p
+
+---
+
+
