@@ -10,7 +10,7 @@ If you find value in this work, any contribution helps keep it going.
 
 I grew up on Kauai. Joined the Navy in January 2000, qualified for nuclear engineering, chose special warfare instead. Served until 2005, came home, and started building things.
 
-Physical products first — footrests, medical devices, automotive prototypes. Designed, prototyped, and sold them myself. Then software — employee perk platforms, sports wagering, video marketplaces. Three startups across a decade, all built solo or as technical lead, all first-to-market in their category.
+Physical products first — footrests, medical devices, automotive prototypes. Designed, prototyped, and sold them myself. Then software — employee perk platforms, item vs item ebay wagers, video marketplaces. Three startups across a decade, all built solo or as technical lead, all first-to-market in their category.
 
 Applied to Y Combinator roughly twenty times over the past two decades. In 2012, in their application section that asks "if you've considered applying with other ideas, list them here," I wrote that if I had significant capital I would build an AI system using GPUs to create a language model, because AI would need to master language first.
 
