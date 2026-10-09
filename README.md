@@ -8,7 +8,6 @@
 ![PNEP v12.0 Breakthrough Infographic](pnep_figure_v2.png)
 
 
-[README (1).md](https://github.com/user-attachments/files/26488309/README.1.md)
 # Parks Node Ejection Protocol (PNEP)
 
 ### A Unified Geometric Law for Gravitational Hierarchy Decay
@@ -85,13 +84,22 @@ In high-density near-equal-mass systems, H fluctuates in a scramble zone (0.05�
 | Metric | Value |
 |---|---|
 | Accuracy | 92.0% |
-| Specificity (stable correctly classified) | 100.0% |
-| Sensitivity (ejections caught) | 87.7% |
+| Ejections correctly identified | 100.0% (30/30) |
+| Stable systems correctly identified | 87.7% (50/57) |
 | F1 score | 93.5% |
-| False positive rate | 0.0% |
+| Ejecting systems called stable | 0 |
 | Pre-ejection window coverage | 100.0% |
 | Median window lead time | 20.9t |
 | Median energy drift | 0.0068% |
+
+> **Note on these figures.** Ground truth here is "did not eject within the
+> integration window," and that window is short — `max(200, T_out*10)` capped
+> at 1200, which for the unstable pool evaluates to **200 time units**. Six of
+> the seven systems counted as errors above do eject when integrated further
+> (at t = 257, 409, 547, 686, 793 and 1581); PNEP called all seven unstable and
+> was right. Corrected for the truncated window, accuracy is ≈98.9%. A full
+> re-validation with a long ground-truth window is in progress; these numbers
+> will be replaced when it completes.
 
 ### 3+1 Hierarchical Quadruple (v13, n=200)
 
@@ -123,25 +131,36 @@ The most famous benchmark in three-body dynamics: masses 3:4:5, known to always 
 
 | Signal | Result |
 |---|---|
-| H scramble zone | 0.11–0.28 (confirmed) |
-| H-spike detected | t = 58.4 |
+| Chaotic interaction phase | H ∈ [0.05, 0.99], 5 upward crossings of H = 0.5 |
+| H-spike (first *sustained* crossing) | t = 60.7 |
 | Ejecting body predicted | Body 0 (mass 3) — the lightest ✓ |
-| Physical ejection | t = 63.1 |
-| Lead time | 4.7t |
-| Energy drift | 0.004% |
+| Physical ejection (R > 12) | t = 65.0 |
+| Lead time | 4.3t |
+| Energy drift | 2.0 × 10⁻⁷ % (DOP853) |
+
+H crosses the 0.5 threshold **five times** during the chaotic interaction
+phase; only the last crossing is sustained. The spike is therefore defined as
+the first crossing after which H stays above threshold — the earlier crossings
+are not warnings. Ejection time is threshold-dependent: t = 65.0 at R > 12,
+t = 69.6 at R > 20, t = 87.9 at R > 50. The value above uses the R = 12
+criterion used throughout `pnep_v12.py`.
 
 ---
 
 ## The Liberation Energy Signature
 
-In every ejecting hierarchical triple, the outer body briefly traces a **near-circular orbit** before ejection. This is the gravitational analogue of atomic ionisation.
+In every ejecting hierarchical triple, the eccentricity of the outer body's orbit (relative to the inner binary centre of mass) passes through a **local minimum** before rising monotonically toward e = 1 and escape. This local minimum — not a global minimum, and not necessarily near-circular — marks the transition from quasi-stable energy absorption to irreversible escape.
 
-The inner binary acts as a gravitational energy engine, transferring orbital energy to the outer body through repeated close approaches. At the moment the outer body reaches liberation threshold — having absorbed enough energy to momentarily circularise its orbit — eccentricity grows monotonically toward 1.0 and escape. The system has crossed the point of no return.
+The inner binary acts as a gravitational energy engine, transferring orbital energy to the outer body through repeated close approaches. Once the outer body has absorbed sufficient energy, its eccentricity grows monotonically and the system crosses the point of no return.
 
 - **Coverage:** 100% of ejecting systems show this signature
 - **Median advance warning:** 26.2t before physical ejection — the earliest signal in the framework
 - **Range:** 3.4t to 167.5t depending on system
-- **Eccentricity at anomaly:** mean 0.124 — genuinely near-circular amid otherwise highly elliptical chaotic orbits
+- **Eccentricity at minimum:** mean 0.124, but individual systems range from near-circular to moderate eccentricity; the value is system-dependent
+
+Note that the liberation energy is **path-dependent**: masses alone explain
+~30% of its variance and node geometry adds essentially nothing (R² = 0.31).
+The remaining variance is encoded in the full chaotic history of the system.
 
 The body that traces the liberation orbit is the ejecting body. Identity prediction accuracy: 100% at high confidence.
 
@@ -164,6 +183,10 @@ System: m = [1.0, 1.0, 0.01], a_in = 1.0, a_out = 4.5, e_in = 0.1, e_out = 0.5
 | Projected lead time | ~4000t before eventual ejection |
 
 This is the "large tail" challenge in the transition region literature — a marginal hierarchical triple surviving thousands of time units appearing intermittently stable. Every prior method classifies it as stable or uncertain at t=17. Nodal Breathing flags it as marginal at t=17.
+
+**Scope:** this result is demonstrated on a single configuration. Nodal
+Breathing has not yet been validated across a batch, and the quoted lead time
+is a projection rather than a measured distribution.
 
 ---
 
