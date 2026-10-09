@@ -83,23 +83,26 @@ In high-density near-equal-mass systems, H fluctuates in a scramble zone (0.05�
 
 | Metric | Value |
 |---|---|
-| Accuracy | 92.0% |
-| Ejections correctly identified | 100.0% (30/30) |
-| Stable systems correctly identified | 87.7% (50/57) |
-| F1 score | 93.5% |
+Ground truth determined by integration to t = 6000 (`verify_revalidation.py`).
+
+| Metric | Value |
+|---|---|
+| Accuracy | 98.9% |
+| Ejections correctly identified | 100.0% (36/36) |
+| Stable systems correctly identified | 98.0% (50/51) |
 | Ejecting systems called stable | 0 |
 | Pre-ejection window coverage | 100.0% |
 | Median window lead time | 20.9t |
-| Median energy drift | 0.0068% |
+| Median energy drift | 0.0077% |
 
-> **Note on these figures.** Ground truth here is "did not eject within the
-> integration window," and that window is short — `max(200, T_out*10)` capped
-> at 1200, which for the unstable pool evaluates to **200 time units**. Six of
-> the seven systems counted as errors above do eject when integrated further
-> (at t = 257, 409, 547, 686, 793 and 1581); PNEP called all seven unstable and
-> was right. Corrected for the truncated window, accuracy is ≈98.9%. A full
-> re-validation with a long ground-truth window is in progress; these numbers
-> will be replaced when it completes.
+> **Why this differs from earlier versions of this README.** Previous figures
+> (92.0% accuracy, 30 ejections) used a ground-truth window of
+> `max(200, T_out*10)` capped at 1200, which for the unstable pool evaluates to
+> **200 time units**. Six systems counted as errors under that window do eject
+> when integrated further — at t = 257, 409, 547, 686, 793 and 1581. PNEP had
+> called all six unstable and was correct; the label was wrong, not the
+> prediction. Re-running with a 6000-unit window moves them to the ejected
+> class and raises accuracy from 92.0% to 98.9%.
 
 ### 3+1 Hierarchical Quadruple (v13, n=200)
 
@@ -154,13 +157,25 @@ In every ejecting hierarchical triple, the eccentricity of the outer body's orbi
 The inner binary acts as a gravitational energy engine, transferring orbital energy to the outer body through repeated close approaches. Once the outer body has absorbed sufficient energy, its eccentricity grows monotonically and the system crosses the point of no return.
 
 - **Coverage:** 100% of ejecting systems show this signature
-- **Median advance warning:** 26.2t before physical ejection — the earliest signal in the framework
-- **Range:** 3.4t to 167.5t depending on system
+- **Median advance warning:** 29.9t before physical ejection (n = 26)
+- **Range:** 3.4t to 220.2t — coefficient of variation 1.09
 - **Eccentricity at minimum:** mean 0.124, but individual systems range from near-circular to moderate eccentricity; the value is system-dependent
 
-Note that the liberation energy is **path-dependent**: masses alone explain
-~30% of its variance and node geometry adds essentially nothing (R² = 0.31).
-The remaining variance is encoded in the full chaotic history of the system.
+**This is a detection, not a forecast.** The coverage is real — every ejecting
+system shows the signature — but the lead time varies by nearly two orders of
+magnitude, with a standard deviation larger than the mean. The median should
+not be read as a prediction interval.
+
+Measuring the lead in **outer orbits** rather than time units was tested
+(`verify_revalidation.py`, Part B) on the hypothesis that liberation sets a
+fixed number of energy-transfer passes. It does not: orbit count is no tighter
+(CV 1.36 retrospective, 1.38 with an online detector) and the comparison
+reverses between the retrospective and online variants, consistent with noise.
+
+This matches the v15.2 result that liberation energy is **path-dependent**:
+masses alone explain ~30% of its variance and node geometry adds essentially
+nothing (R² = 0.31). The remaining variance is encoded in the full chaotic
+history of the system, and no node-local observable tested so far recovers it.
 
 The body that traces the liberation orbit is the ejecting body. Identity prediction accuracy: 100% at high confidence.
 
