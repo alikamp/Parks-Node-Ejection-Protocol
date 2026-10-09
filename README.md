@@ -181,6 +181,36 @@ The body that traces the liberation orbit is the ejecting body. Identity predict
 
 ---
 
+## Why H Ignores Mass
+
+H uses only geometry — `Var(d12, d23, d31)` — and discards the masses
+entirely. Three mass-aware alternatives were tested against it on the same
+nodes in the same integration (`verify_index_variants.py`, n = 51):
+
+| Index | mean (stable) | mean (ejected) | separation | best accuracy |
+|---|---|---|---|---|
+| **H** — mass-blind geometric variance | 0.869 | 0.044 | **0.825** | **98.0%** |
+| H_E — pairwise binding energy, −G·m_i·m_j/d_ij | 0.610 | 0.278 | 0.332 | 98.0% |
+| H_μ — reduced-mass-weighted separations | 0.263 | 0.095 | 0.168 | 96.1% |
+| H_r — mass-weighted distance to the CoM of the other two | 0.092 | 0.146 | 0.054 | 84.3% |
+
+H_E matches H on accuracy but with a quarter of the class separation, leaving
+it far closer to the decision boundary. H_r is worse outright and its polarity
+inverts — stable systems score *lower* than ejecting ones.
+
+Mass-weighting does not improve discrimination; it dilutes it. The signal at
+mirror symmetry nodes appears to be geometric rather than dynamical.
+
+**Scope:** the IC generator samples masses in [0.15, 1.6], so extreme mass
+ratios are untested, and the normalisation of the three variants (scaling by
+the mean before taking variance) is one choice among several.
+
+Note that the *global* centre of mass is identically zero in the CoM frame
+where all integrations are run, so no index can be built on it directly —
+the same frame-dependence that invalidated the early alignment term.
+
+---
+
 ## Nodal Breathing — The Earliest Warning Signal
 
 In the slow-decay regime, the inter-node time interval begins rhythmic oscillation **long before** the H slope turns terminal. This is **Nodal Breathing** — the earliest pre-ejection signal in the entire framework.
