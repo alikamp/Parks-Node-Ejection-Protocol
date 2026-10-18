@@ -565,10 +565,16 @@ numbers:
 | C→B | **−1.188** | −0.769 | 0.996 | 5 |
 | C→D | 0.472 | −5.723 | **0.287** | 3 |
 
-Four of the five transitions are Arrhenius at R² ≥ 0.988. The activation
-energies are extracted from a purely geometric scalar — H sees only the
-variance of three distances, never an energy — and **B→C lands at 1.124 ε,
-roughly the cost of breaking one pair contact.**
+Four of the five transitions are Arrhenius at R² ≥ 0.988, extracted from a
+purely geometric scalar — H sees only the variance of three distances, never
+an energy — with B→C the largest at 1.124 ε, in the region of one pair
+contact.
+
+> **Qualified by section 14.** The state process is *not* Markovian, so these
+> are lag-dependent empirical crossing frequencies, not Markov rates. The
+> words "barrier", "rate-limiting" and "transition-state" are withdrawn
+> pending the stride-dependence test; what the fits establish is a clean
+> exponential temperature dependence, which is a weaker claim.
 
 C→B has a *negative* activation energy and the rate genuinely falls with
 heating, 4.97 down to 1.41. That is the expected signature of a barrierless
@@ -608,8 +614,10 @@ physics lives in the one step that breaks detailed balance.
 
 - **D is absorbing.** Dwell of order 10³ time units against ~2 for every other
   state. Detachment does not reverse.
-- **C is a transition state, not a basin.** Dwell 0.20–0.71, and C→B runs 6–68×
-  faster than B→C. Trios pass through it.
+- **C is short-lived relative to A and B.** Dwell 0.20–0.71, and C→B runs
+  6–68× faster than B→C. Trios pass through it rather than settling in it.
+  (Stated as a dwell measurement; "transition state" in the kinetic sense
+  would require the Markov property, which section 14 shows does not hold.)
 - **A's occupancy is flat** across a 2.2× temperature range (0.253–0.278,
   regression p = 0.357) while B drains monotonically from 0.720 to 0.532
   (p = 0.002). The compact state is thermally insulated in a way the bulk
@@ -636,6 +644,88 @@ version of this script computed dwell times against a sample count rather
 than an exit count; the published table above is the corrected one, and the
 error had inverted the apparent temperature trend of state A.
 
+A third, found later: **the Poisson errors on k_CD understate the real
+uncertainty.** A 40-seed run at T0 = 0.95 gives k_CD = 0.00127 ± 0.00004
+against 0.00172 ± 0.00009 from the 12-seed run above — 4.5σ apart on
+different seeds. Run-to-run heterogeneity, not counting noise, dominates the
+error budget, because whether a given trajectory evaporates at all is close
+to binary. Any future quote of k_CD needs seed-level scatter, not √n.
+
+---
+
+## 14. The four-state model is not Markovian
+
+Section 13 reports rate constants and activation energies. Those quantities
+only carry their usual meaning if the state process is Markovian on this
+state space, which section 13 assumed without testing. `markov.py` tests it
+two standard ways, 8 seeds per temperature.
+
+### Implied timescales never plateau
+
+t_i(τ) = −τ / ln λ_i(τ) from the eigenvalues of the lag-τ transition matrix.
+For a Markov process these are independent of τ.
+
+| T0 = 0.95, lag (t.u.) | 0.02 | 0.04 | 0.08 | 0.16 | 0.32 | 0.64 | 1.28 |
+|---|---|---|---|---|---|---|---|
+| t2 | 1161 | 1178 | 1211 | 1320 | 1565 | 1986 | 2664 |
+| t3 | 1.261 | 1.260 | 1.275 | 1.359 | 1.639 | 2.238 | 3.138 |
+| t4 | 0.600 | 0.594 | 0.591 | 0.613 | 0.723 | 1.035 | 1.530 |
+
+Every column drifts monotonically upward and is still climbing at the longest
+lag tested. t3 and t4 grow by about 2.5×.
+
+### Chapman-Kolmogorov fails
+
+Measured T(nτ) against predicted T(τ)ⁿ, base lag 0.16 t.u.:
+
+| n | lag (t.u.) | T0 = 0.65 | T0 = 0.95 | T0 = 1.10 |
+|---|---|---|---|---|
+| 2 | 0.32 | 0.070 | 0.042 | 0.041 |
+| 4 | 0.64 | 0.264 | 0.158 | 0.153 |
+| 8 | 1.28 | 0.353 | 0.267 | 0.252 |
+
+Counting noise here is of order 0.001. Errors of 0.25–0.35 on a probability
+matrix are a failure, not a near miss.
+
+### The stationary distribution is wrong
+
+Leading left eigenvector against directly measured occupancy:
+
+| T0 | π (eigenvector) | measured |
+|---|---|---|
+| 0.95 | 0.228 / 0.479 / 0.092 / 0.201 | 0.255 / 0.534 / 0.102 / 0.108 |
+| 1.10 | 0.128 / 0.259 / 0.048 / 0.566 | 0.224 / 0.455 / 0.083 / 0.237 |
+
+D is off by roughly 2×. At T0 = 0.65 the computation returns numerical
+garbage in t2 (values of order 10¹⁷): D is almost never visited there, the
+matrix goes near-singular, and the solver collapses onto the absorbing state.
+
+### Diagnosis
+
+**D being absorbing is the primary cause.** t2 ≈ 10³ is not a relaxation
+timescale, it is the drainage time into D, and an absorbing state makes the
+stationary distribution meaningless. But t3 and t4 drift as well, so the
+A↔B↔C ladder is non-Markovian on its own account. Four states cut on H are
+too coarse: the H coordinate does not separate the system's true metastable
+states, and there is structure inside the bands.
+
+### What this does and does not retract
+
+Unaffected, because they are direct counts rather than model inferences:
+multimodality with temperature-invariant mode positions; detailed balance at
+0.01–0.08% on the ladder and 59–82% breakage at C↔D; D's absorbing dwell;
+C's short dwell; all occupancies.
+
+Retracted: "barrier", "rate-limiting step", "transition state" in the
+kinetic sense, and the reading of 1.124 ε as a pair-contact binding energy.
+
+Still standing, as a weaker claim: the empirical crossing frequencies have a
+clean exponential temperature dependence at R² ≥ 0.988. Whether the fitted
+Ea is a physical quantity or an artifact of the sampling stride is decided by
+`ea_lag.py`, which refits Ea separately at each lag. Flat Ea(τ) means the
+activation energy survives the loss of the Markov property; drifting Ea(τ)
+means 1.124 ε was a consequence of choosing SAMP = 5.
+
 ---
 
 ## Summary of the molecular work
@@ -648,19 +738,22 @@ Three statements, all supported:
 - **As a precursor, Lindemann beats every H-derived quantity tested** — band
   populations, band transfer rates, spatial domain structure, turning angle,
   and H itself (sections 7, 9, 10, 11).
-- **The H field has resolvable kinetic structure** — four temperature-invariant
-  states, four Arrhenius transitions at R² ≥ 0.988, a rate-limiting barrier of
-  1.124 ε recovered from geometry alone, and detailed balance that holds on the
-  reversible ladder and breaks only at the ejection step (section 13).
+- **The H field has discrete, temperature-invariant structure** — four states
+  whose mode positions do not move with temperature, crossing frequencies with
+  a clean exponential temperature dependence at R² ≥ 0.988, and detailed
+  balance that holds on the reversible ladder to 0.08% and breaks only at the
+  ejection step (section 13).
 
 The H construction describes the current state of structural integrity better
 than the standard metric. It does not predict failure better. Those are
 different claims and only the first one is supported here.
 
-The third statement is about mechanism rather than performance: it says the
-scalar decomposes into a well-behaved kinetic system, not that the system
-forecasts anything. The one rate constant that would make it predictive,
-k_CD, is the one the current statistics do not determine.
+The third statement is about structure rather than performance, and it is
+weaker than it first appeared: section 14 shows the four-state process is not
+Markovian, so the fitted activation energies cannot be read as barrier
+heights and the system is not a validated kinetic model. The one rate
+constant that would make it predictive, k_CD, is also the one the current
+statistics do not determine.
 
 ---
 
