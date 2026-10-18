@@ -120,6 +120,61 @@ Temperature determines **which regime you are in**, not what H reads.
 
 ---
 
+## 4. H does not beat trivial baselines
+
+The test that matters for any claim of utility: does H outperform simply
+watching the largest or mean pairwise separation? 240 trajectories at
+tau = 0.94-1.29, 187 dissociations.
+
+**As an early-warning signal** (same sustained-crossing rule, threshold tuned
+per signal):
+
+| signal | threshold | n | median lead | min lead | CV |
+|---|---|---|---|---|---|
+| H | 0.20 | 176 | 17.25 | 4.35 | 0.688 |
+| max pairwise distance | 2.00 | 176 | 17.62 | 4.55 | **0.673** |
+| mean pairwise distance | 1.50 | 176 | 17.27 | 4.70 | **0.672** |
+
+**As a hazard estimator** (split-half validated, quantile-binned):
+
+| delta | signal | Brier | AUC | calib. error |
+|---|---|---|---|---|
+| 10 | H | 0.0675 | 0.942 | 1.3% |
+| 10 | max distance | 0.0650 | 0.947 | 1.3% |
+| 10 | mean distance | **0.0645** | **0.950** | 1.3% |
+
+H is marginally *worse* than both baselines on every metric at every time
+horizon. In a three-body system it adds nothing: the variance of three
+distances carries no information beyond their mean.
+
+**This is the central negative result of this directory.** The node-scalar
+approach does transfer to molecular dissociation in the near-threshold
+regime, but the specific scalar is not what makes it work.
+
+---
+
+## 5. What does work: a calibrated dissociation hazard
+
+Setting aside which signal feeds it, the hazard model itself is sound and
+generalises out of sample:
+
+| H bin | P(dissociate within 20) train | test | n_test |
+|---|---|---|---|
+| 0.0-0.1 | 5.4% | 4.8% | 30370 |
+| 0.3-0.4 | 27.3% | 27.4% | 3034 |
+| 0.5-0.6 | 39.7% | 42.9% | 2026 |
+| 0.8-1.0 | 86.7% | 87.6% | 22536 |
+
+Mean calibration error 2.4%, AUC 0.915. At delta = 10 the top-to-bottom
+hazard ratio is 87x with 1.3% calibration error.
+
+This is the useful output for adaptive sampling: a population-level statement
+("27% of configurations in this band dissociate within 20 time units") that
+holds on held-out data. It is a weaker claim than per-trajectory prediction and
+a more reliable one. But it should be built on mean pairwise distance, not H.
+
+---
+
 ## What does not work
 
 - **Curvature spike.** Frenet curvature of the escaping atom, |v × a|/|v|³.
@@ -136,12 +191,23 @@ Temperature determines **which regime you are in**, not what H reads.
 
 ## Scope of the claim
 
-This is not a demonstration that PNEP generalises to molecular dynamics. It is
-a demonstration that **the node-scalar approach transfers to Lennard-Jones
-dissociation within a bounded regime**, that the boundary is physically
-identifiable in advance via tau, and that the transfer requires an
-equilibrium-referenced coordinate to avoid inverting on repulsive
+This is not a demonstration that PNEP generalises to molecular dynamics, and
+it is not a claim that H is useful in this setting.
+
+What it establishes: a geometric node scalar yields a **well-calibrated
+dissociation hazard** in Lennard-Jones systems within a bounded regime
+(tau ~ 1), the boundary is identifiable in advance, and the transfer requires
+an equilibrium-referenced coordinate to avoid inverting on repulsive
 configurations.
+
+What it refutes: that **H specifically** is the right scalar. Mean pairwise
+distance matches or beats it on every metric tested. H's advantage in the
+gravitational case does not survive the move to a non-monotonic potential with
+only three bodies.
+
+Whether H earns its place in larger clusters -- where there is no single
+obvious distance to monitor and the scalar is computed over many triples -- is
+open and under test.
 
 Single potential form, three bodies, one trimer geometry, small per-cell
 samples. Generalisation to larger clusters, other potentials, solvated systems
