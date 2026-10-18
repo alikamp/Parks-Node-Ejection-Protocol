@@ -333,6 +333,88 @@ minimum (−44.327) was used instead.
 
 ---
 
+## 9. Spatial domains in the H field
+
+Pairwise correlation (section 7) asks whether H_i(t) covaries with H_j(t) for
+fixed pairs. A different question: at each instant, are the triples with
+*similar* H spatially contiguous? `domains.py`.
+
+Select the top and bottom quartile of triples by H, compare their mean
+pairwise centroid separation to random subsets of equal size, report a
+z-score. Negative = clustered.
+
+| T0 | z (top quartile) | z (bottom quartile) | atom concentration | z (disjoint control) |
+|---|---|---|---|---|
+| 0.40 | −8.87 | +3.82 | 0.102 | −2.32 |
+| 0.60 | −7.48 | +3.67 | 0.115 | −2.33 |
+| 0.75 | −5.90 | +3.04 | 0.135 | −2.07 |
+| 0.90 | −5.79 | +2.51 | 0.141 | −1.80 |
+| 1.10 | −7.37 | +2.59 | 0.131 | −2.04 |
+| 1.40 | −5.16 | +3.25 | 0.138 | −2.07 |
+
+**The structure is real.** High-H triples cluster; low-H triples disperse.
+Two controls support it: atom concentration is 0.10–0.14 against 0.077 for
+even representation, so no single stray atom drives the selection; and the
+disjoint-subset test — restricted to triples sharing no atoms with each other,
+removing all shared-distance coupling — still gives z ≈ −2.
+
+Note that the raw z of −5 to −9 overstates it: roughly two thirds of that is
+shared-atom coupling. The honest figure is the disjoint control.
+
+**But it is temperature-invariant.** z(disjoint) is flat from −1.80 to −2.33
+across solid, melted and heavily evaporating states. Domain structure is a
+static geometric property of the cluster, not a precursor. There is no early
+warning in it.
+
+This also explains the null result in section 7: time-covariance of fixed
+pairs and instantaneous spatial contiguity of a quantile are different
+measurements, and only the second one sees this.
+
+---
+
+## 10. Turning angle: real signal, inverted from the hypothesis
+
+Section "what does not work" records a failed curvature test using the Frenet
+curvature |v × a| / |v|³. That was the wrong quantity: dividing by speed cubed
+means a fast atom taking a hard hit scores low while a slow drifting atom
+scores high. The scale-free measurement is the angle between successive
+velocity vectors. `turning_angle.py`.
+
+Mean turning angle by lag (π/2 = 1.571 indicates full decorrelation):
+
+| T0 | lag 1 | lag 5 | lag 10 | lag 25 |
+|---|---|---|---|---|
+| 0.40 | 0.213 | 1.019 | 1.669 | 1.545 |
+| 0.75 | 0.195 | 0.928 | 1.524 | 1.536 |
+| 1.10 | 0.172 | 0.819 | 1.354 | 1.409 |
+| 1.40 | 0.156 | 0.737 | 1.225 | 1.310 |
+
+Velocity memory persists to about lag 10 (0.2 time units) and is gone by lag
+25. An earlier version of this test used lag 25 and therefore measured the
+random-direction value at every temperature.
+
+Correlation of turning angle with H, within fixed temperature:
+
+| T0 | lag 5 |
+|---|---|
+| 0.40 | −0.113 |
+| 0.75 | −0.259 |
+| 1.10 | −0.466 |
+| 1.40 | −0.463 |
+
+**Negative, strengthening with temperature.** Higher H accompanies *smaller*
+turning angles. The physical reading: an atom still bound is batted around and
+turns constantly; an atom on its way out is moving ballistically and has
+stopped turning. The kick that frees it is itself a hard turn, but it lasts an
+instant — what persists, and what is detectable, is the straightness that
+follows.
+
+At ρ = −0.47 this is the second-strongest signal in this directory after
+H_frac, and it is a velocity-space observable, independent of the
+position-space quantities everything else here measures.
+
+---
+
 ## What does not work
 
 - **Curvature spike.** Frenet curvature of the escaping atom, |v × a|/|v|³.
