@@ -524,9 +524,123 @@ of sections 7, 9, 10 and 11 the prior should be that it does not.
 
 ---
 
+## 13. The H field is a four-state kinetic system
+
+Sections 11 and 12 binned H on a grid chosen for convenience. This asks
+whether the bins are real. `kinetics.py`, 12 seeds per temperature.
+
+The H distribution over all 286 triples is **multimodal with
+temperature-invariant mode positions**: peaks near H = 0.038 and H = 0.113 sit
+at the same place at T0 = 0.40, 0.75 and 1.10, and a third near 0.96 appears
+only once evaporation starts. Heating changes the occupancies, not the
+locations. That is what licenses a discrete-state treatment instead of a
+continuum, so the states are cut at the density minima rather than at round
+numbers:
+
+| state | range | reading |
+|---|---|---|
+| A | H < 0.07 | compact |
+| B | 0.07 – 0.22 | bulk |
+| C | 0.22 – 0.60 | stretched |
+| D | H ≥ 0.60 | detached |
+
+### Rate constants
+
+| transition | 0.50 | 0.65 | 0.80 | 0.95 | 1.10 |
+|---|---|---|---|---|---|
+| A→B | 0.387 | 0.472 | 0.521 | 0.587 | 0.592 |
+| B→A | 0.144 | 0.190 | 0.222 | 0.267 | 0.281 |
+| B→C | 0.073 | 0.124 | 0.163 | 0.225 | 0.242 |
+| C→B | 4.966 | 2.936 | 2.056 | 1.535 | 1.414 |
+| C→D | 0.000 | 0.000 | 0.002 | 0.002 | 0.002 |
+| D→C | 0.000 | 0.000 | 0.001 | 0.002 | 0.001 |
+
+### Arrhenius
+
+| transition | Ea (ε) | ln A | R² | n |
+|---|---|---|---|---|
+| A→B | 0.406 | −0.134 | 0.988 | 5 |
+| B→A | 0.624 | −0.695 | 0.993 | 5 |
+| B→C | **1.124** | −0.368 | 0.993 | 5 |
+| C→B | **−1.188** | −0.769 | 0.996 | 5 |
+| C→D | 0.472 | −5.723 | **0.287** | 3 |
+
+Four of the five transitions are Arrhenius at R² ≥ 0.988. The activation
+energies are extracted from a purely geometric scalar — H sees only the
+variance of three distances, never an energy — and **B→C lands at 1.124 ε,
+roughly the cost of breaking one pair contact.**
+
+C→B has a *negative* activation energy and the rate genuinely falls with
+heating, 4.97 down to 1.41. That is the expected signature of a barrierless
+relaxation: a stretched trio collapsing back into the bulk basin has nothing
+to climb, and higher thermal velocity makes recapture less likely.
+
+### Detailed balance locates the one irreversible channel
+
+Fractional flux imbalance |n_ij − n_ji| / n_ij:
+
+| T0 | A↔B | B↔C | C↔D |
+|---|---|---|---|
+| 0.50 | 0.01% | 0.00% | — |
+| 0.65 | 0.02% | 0.00% | — |
+| 0.80 | 0.02% | 0.02% | **81.5%** |
+| 0.95 | 0.02% | 0.05% | **69.7%** |
+| 1.10 | 0.01% | 0.08% | **59.1%** |
+
+The A↔B↔C ladder is in detailed balance to within 0.08%. C↔D is not, by two
+to three orders of magnitude more.
+
+This reframes section 11. The net flux there was structurally zero not
+because the H field carries no kinetic information, but because the part of
+it that was measured is **equilibrated**. The system is a reversible
+three-state ladder feeding a single absorbing sink, and all of the ejection
+physics lives in the one step that breaks detailed balance.
+
+### Occupancy and dwell
+
+| T0 | A occ | B occ | C occ | D occ | A dwl | B dwl | C dwl | D dwl |
+|---|---|---|---|---|---|---|---|---|
+| 0.50 | 0.2690 | 0.7204 | 0.0106 | 0.0000 | 2.59 | 4.60 | 0.20 | — |
+| 0.65 | 0.2783 | 0.6926 | 0.0292 | 0.0000 | 2.12 | 3.19 | 0.34 | — |
+| 0.80 | 0.2735 | 0.6418 | 0.0510 | 0.0337 | 1.92 | 2.59 | 0.49 | 1849 |
+| 0.95 | 0.2764 | 0.6074 | 0.0892 | 0.0270 | 1.70 | 2.03 | 0.65 | 580 |
+| 1.10 | 0.2525 | 0.5318 | 0.0909 | 0.1248 | 1.69 | 1.91 | 0.71 | 1447 |
+
+- **D is absorbing.** Dwell of order 10³ time units against ~2 for every other
+  state. Detachment does not reverse.
+- **C is a transition state, not a basin.** Dwell 0.20–0.71, and C→B runs 6–68×
+  faster than B→C. Trios pass through it.
+- **A's occupancy is flat** across a 2.2× temperature range (0.253–0.278,
+  regression p = 0.357) while B drains monotonically from 0.720 to 0.532
+  (p = 0.002). The compact state is thermally insulated in a way the bulk
+  state is not.
+- C's dwell time *rises* with temperature, 0.20 to 0.71. The transition state
+  gets stickier as the cluster is heated. Unexplained.
+
+### What is not determined
+
+**The rate that matters is the one that is not pinned.** Ejection flux
+factorises as occ(C) × k_CD. occ(C) is a pure geometric quantity computable
+from H and is well determined (0.011 → 0.091). k_CD is not: only 243, 379 and
+521 events across the three temperatures that produce any, running
+non-monotonically (0.00193, 0.00172, 0.00232) for an Arrhenius R² of 0.287.
+
+Whether the ejection rate is predictable from geometry alone turns on whether
+k_CD is temperature-flat, and the present statistics cannot say. `kcd.py`
+addresses this directly with 40 seeds over a hotter range.
+
+Two further cautions. The quasi-equilibrium identity flux = occ(C) × k_CD is
+**algebraically circular** as written — it expands to the observed flux — so
+it is a bookkeeping decomposition and not a test of anything. And an earlier
+version of this script computed dwell times against a sample count rather
+than an exit count; the published table above is the corrected one, and the
+error had inverted the apparent temperature trend of state A.
+
+---
+
 ## Summary of the molecular work
 
-Two sentences, both supported:
+Three statements, all supported:
 
 - **As a state readout, H_frac beats the Lindemann parameter** — within-
   temperature correlation with cluster disintegration of 0.952 against 0.784,
@@ -534,10 +648,19 @@ Two sentences, both supported:
 - **As a precursor, Lindemann beats every H-derived quantity tested** — band
   populations, band transfer rates, spatial domain structure, turning angle,
   and H itself (sections 7, 9, 10, 11).
+- **The H field has resolvable kinetic structure** — four temperature-invariant
+  states, four Arrhenius transitions at R² ≥ 0.988, a rate-limiting barrier of
+  1.124 ε recovered from geometry alone, and detailed balance that holds on the
+  reversible ladder and breaks only at the ejection step (section 13).
 
 The H construction describes the current state of structural integrity better
 than the standard metric. It does not predict failure better. Those are
 different claims and only the first one is supported here.
+
+The third statement is about mechanism rather than performance: it says the
+scalar decomposes into a well-behaved kinetic system, not that the system
+forecasts anything. The one rate constant that would make it predictive,
+k_CD, is the one the current statistics do not determine.
 
 ---
 
