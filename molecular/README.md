@@ -728,6 +728,131 @@ means 1.124 ε was a consequence of choosing SAMP = 5.
 
 ---
 
+## 15. The activation energies do not survive: withdrawn
+
+`ea_lag.py` refits Arrhenius separately at each lag, 5 temperatures × 8 seeds.
+
+### Ea depends on the sampling stride
+
+| transition | τ = 0.02 | 0.08 | 0.32 | 1.28 | drift |
+|---|---|---|---|---|---|
+| A→B | 0.187 | 0.197 | 0.279 | 0.511 | **173%** |
+| B→A | 0.386 | 0.396 | 0.478 | 0.710 | **84%** |
+| B→C | 0.514 | 0.524 | 0.617 | 0.814 | **58%** |
+| C→B | −0.420 | −0.410 | −0.317 | −0.122 | **71%** |
+| C→D | 4.323 | 4.504 | 5.495 | 6.759 | **56%** |
+
+No transition is stride-independent. The activation energy is a function of
+how often the trajectory was sampled, not a property of the system.
+
+### Ea also moves under reseeding
+
+At the *same* lag of 1 sample, this run gives B→C Ea = 0.514. Section 13 gives
+**1.124** for the same transition at the same lag. The only difference is the
+seed set (3000–3007, n = 8 against 0–11, n = 12). A factor of 2.2 from
+reseeding alone.
+
+So the R² of 0.988–0.996 quoted in section 13 was measuring the wrong thing:
+a tight line through five points that are themselves unstable under
+resampling. Excellent fit, badly determined parameters.
+
+**The activation energies of section 13 are withdrawn** — not reinterpreted,
+withdrawn. They are not reproducible across strides or across seeds.
+
+### The one ordering that does survive
+
+C→D has an activation energy several times larger than any ladder transition:
+4.3–6.8 here, and ≈ 3.3–3.9 from the independent 40-seed `kcd.py` run
+(k_CD = 0.00127, 0.00203, 0.00312 at T0 = 0.95, 1.10, 1.25, monotonic and
+well outside its error bars). Different estimator, different seeds, same
+conclusion — detachment costs several times what a band crossing costs. The
+ordering is robust even though no magnitude is.
+
+### The methodological finding, which matters more
+
+Three independent symptoms of the same problem:
+
+| quantity | run 1 | run 2 | cause of difference |
+|---|---|---|---|
+| Ea(B→C) | 1.124 | 0.514 | seed set only |
+| k_CD(T0 = 0.95) | 0.00172 ± 0.00009 | 0.00127 ± 0.00004 | seed set only (4.5σ) |
+| CK error, n = 8, T0 = 0.65 | 0.353 | 0.620 | seed set only |
+
+Every quoted error bar in sections 13–14 came from within-run sample counts
+(123M samples) when the real variance is between-run (6–12 trajectories).
+**At this seed count essentially nothing in the molecular kinetics is
+reproducible.** Whether a given trajectory evaporates at all is close to
+binary, so run-to-run heterogeneity dominates and √n is the wrong
+denominator. Any future number from this line of work needs seed-block
+scatter, not sample-count Poisson errors.
+
+---
+
+## 16. A second coordinate does not recover the Markov property
+
+If H is too coarse, the natural fix is H plus a second coordinate. The
+best-motivated candidate came from section 1: H is **sign-blind**, since
+variance is symmetric, so a trio at H = 0.15 might be compressed or stretched
+and H cannot tell. Two populations sharing one H value would produce exactly
+the drifting timescales observed.
+
+Second coordinate: u = mean over the trio's three pairs of (r − r_min)/r_min.
+`usplit.py`, 6 seeds per temperature, four models at matched state count.
+
+### The mechanism is refuted before the test runs
+
+| T0 = 0.65, band | population | median u | fraction compressed (u < 0) |
+|---|---|---|---|
+| A | 0.2877 | +0.1260 | 0.116 |
+| B | 0.6411 | +0.4514 | 0.000 |
+| C | 0.0712 | +0.7031 | 0.000 |
+| D | 0.0000 | +1.5693 | 0.000 |
+
+**There is no compressed population.** Essentially every triple is stretched
+relative to r_min, and median u rises monotonically across bands. H is not
+hiding a compressed/stretched degeneracy because one of the two does not
+exist in this system.
+
+### The test runs anyway, and u loses
+
+Split at the band median of u rather than at zero, so the test still asks
+whether u-magnitude adds information. Controls: M3 splits each band at its
+median H (does finer resolution of the same coordinate do as well?), M4 splits
+at a shuffled u (does anything beyond state count operate at all?).
+
+| T0 = 0.95 | CK n=2 | CK n=4 | CK n=8 |
+|---|---|---|---|
+| M1 H bands (4) | 0.0360 | 0.1344 | 0.2300 |
+| M2 H × u (8) | 0.0498 | 0.1540 | 0.2387 |
+| M3 H × H (8) | **0.0184** | **0.0723** | **0.1440** |
+| M4 H × shuffled (8) | 0.0528 | 0.1149 | 0.1856 |
+
+| T0 = 0.65 | CK n=2 | CK n=4 | CK n=8 |
+|---|---|---|---|
+| M1 H bands (4) | 0.0854 | 0.3160 | 0.6197 |
+| M2 H × u (8) | 0.0882 | 0.3440 | 0.6067 |
+| M3 H × H (8) | 0.0705 | 0.2735 | 0.4600 |
+| M4 H × shuffled (8) | **0.0512** | **0.1863** | **0.4053** |
+
+u is the worst of the four at T0 = 0.95 — worse than not splitting at all.
+At T0 = 0.65 the *shuffled* control wins, so there a random cut outperforms
+both informed coordinates.
+
+**Finer resolution of H (M3) beats a second coordinate (M2) consistently.**
+The bands are too coarse; the scalar is not missing a dimension. "H plus a
+second coordinate" is not the shape of the fix, at least not with the
+best-motivated candidate available.
+
+### A trap worth recording
+
+M2 at T0 = 0.95 produces a beautifully flat implied timescale — 3599.9 at
+lag 1 against 3589.5 at lag 64, drift 0.3% — while posting the *worst* CK
+error of the four models. The D-band split created a near-absorbing pair with
+λ ≈ 1. A flat implied timescale is not evidence of Markovianity on its own;
+run with CK alongside it or the artifact reads as a success.
+
+---
+
 ## Summary of the molecular work
 
 Three statements, all supported:
@@ -739,21 +864,31 @@ Three statements, all supported:
   populations, band transfer rates, spatial domain structure, turning angle,
   and H itself (sections 7, 9, 10, 11).
 - **The H field has discrete, temperature-invariant structure** — four states
-  whose mode positions do not move with temperature, crossing frequencies with
-  a clean exponential temperature dependence at R² ≥ 0.988, and detailed
-  balance that holds on the reversible ladder to 0.08% and breaks only at the
-  ejection step (section 13).
+  whose mode positions do not move with temperature, and detailed balance that
+  holds on the reversible ladder to 0.08% while breaking by 59–82% at the
+  ejection step (section 13). Both are direct counts.
 
 The H construction describes the current state of structural integrity better
 than the standard metric. It does not predict failure better. Those are
 different claims and only the first one is supported here.
 
-The third statement is about structure rather than performance, and it is
-weaker than it first appeared: section 14 shows the four-state process is not
-Markovian, so the fitted activation energies cannot be read as barrier
-heights and the system is not a validated kinetic model. The one rate
-constant that would make it predictive, k_CD, is also the one the current
-statistics do not determine.
+The third statement is deliberately narrow. What was built on top of it did
+not hold: the four-state process is not Markovian (section 14), and the
+Arrhenius activation energies are withdrawn as reproducible neither across
+sampling strides nor across seeds (section 15). A second coordinate does not
+fix it, and finer resolution of H outperforms one (section 16).
+
+### The limiting problem is statistical, not conceptual
+
+Sections 13–16 quoted error bars from within-run sample counts — 123 million
+samples — when the real variance is between-run, across 6 to 12 trajectories.
+Reseeding alone moves Ea by 2.2×, k_CD by 4.5σ, and the CK error by 75%.
+Whether a trajectory evaporates at all is close to binary, so run-to-run
+heterogeneity dominates and √n is the wrong denominator.
+
+**At this seed count the molecular kinetics does not reproduce.** That is the
+first thing to fix before any of it is worth quoting, and it applies
+retroactively to every number in sections 13–16 that is not a direct count.
 
 ---
 
