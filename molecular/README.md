@@ -415,6 +415,79 @@ position-space quantities everything else here measures.
 
 ---
 
+## 11. Band populations and transfer rates: state yes, precursor no
+
+Triples binned into H bands [0, .05, .10, .20, .35, .55, 1.01]; populations
+and band-to-band transfer rates tracked over time.
+`band_populations.py`, `band_flux.py`. 30 seeds per temperature.
+
+### Composition is a clean state readout
+
+| T0 | band2 (.10-.20) | band3 (.20-.35) | band5 (.55+) | Lindemann | evaporated |
+|---|---|---|---|---|---|
+| 0.40 | 0.539 | 0.030 | 0.000 | 0.047 | 0.00 |
+| 0.60 | 0.520 | 0.052 | 0.000 | 0.092 | 0.00 |
+| 0.75 | 0.484 | 0.081 | 0.016 | 0.170 | 0.07 |
+| 0.90 | 0.443 | 0.104 | 0.049 | 0.238 | 0.21 |
+| 1.10 | 0.381 | 0.122 | 0.125 | 0.300 | 0.57 |
+
+Monotonic transfer out of band 2 into bands 3 and 5. Band 3 nearly doubles
+between T0 = 0.40 and 0.60, before Lindemann crosses the melting criterion and
+before anything evaporates.
+
+### Net flux is zero by detailed balance
+
+| T0 | up flux | down flux | net | mobility |
+|---|---|---|---|---|
+| 0.60 | 0.0149 | 0.0149 | +0.00000 | 0.0298 |
+| 0.75 | 0.0147 | 0.0147 | +0.00000 | 0.0293 |
+| 0.90 | 0.0140 | 0.0140 | +0.00000 | 0.0280 |
+| 1.10 | 0.0122 | 0.0122 | +0.00001 | 0.0243 |
+
+Up and down flux cancel to five decimals at every temperature. A trajectory-
+averaged net flux cannot be a precursor: it is structurally zero.
+
+### Head to head as a precursor — Lindemann wins
+
+Window before the first evaporation, against a matched window in runs at the
+same T0 that never evaporate.
+
+| T0 (evap/stable) | net flux | up flux | mobility | band3 | band5 | **Lindemann** |
+|---|---|---|---|---|---|---|
+| 0.75 (3/27) | 0.012 * | 0.021 * | 0.223 | 0.032 * | 0.167 | **0.000 *** |
+| 0.90 (9/21) | 0.326 | 0.123 | 0.096 | 0.056 | 0.062 | **0.000 *** |
+| 1.10 (20/10) | 0.447 | 0.000 *† | 0.000 *† | 0.086 | 0.001 * | **0.000 *** |
+
+(p-values; † = significant but in the **opposite** direction to the hypothesis)
+
+Net flux is significant only where n = 3. At the temperatures with real
+statistics it fails. Up-flux and mobility reach p = 0.000 at T0 = 1.10 but
+both are *lower* before evaporation, not higher: once a triple contains an
+outbound atom it pins in the top band and stops crossing, so the composition
+freezes as the cluster comes apart. A real mechanism, the reverse of the
+hypothesised churn. Band 5 population is significant but near-definitional.
+
+Lindemann is significant at every temperature at p = 0.000.
+
+---
+
+## Summary of the molecular work
+
+Two sentences, both supported:
+
+- **As a state readout, H_frac beats the Lindemann parameter** — within-
+  temperature correlation with cluster disintegration of 0.952 against 0.784,
+  with the margin widening where Lindemann saturates (section 6).
+- **As a precursor, Lindemann beats every H-derived quantity tested** — band
+  populations, band transfer rates, spatial domain structure, turning angle,
+  and H itself (sections 7, 9, 10, 11).
+
+The H construction describes the current state of structural integrity better
+than the standard metric. It does not predict failure better. Those are
+different claims and only the first one is supported here.
+
+---
+
 ## What does not work
 
 - **Curvature spike.** Frenet curvature of the escaping atom, |v × a|/|v|³.
