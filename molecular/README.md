@@ -175,6 +175,83 @@ a more reliable one. But it should be built on mean pairwise distance, not H.
 
 ---
 
+## 6. LJ-13 cluster: a state variable, not a forecast
+
+Three bodies give one triple, so there is no distribution to examine and
+"watch the largest separation" is a free baseline. A 13-atom icosahedral
+cluster removes both problems: H is computed over all C(13,3) = 286 triples
+and aggregated, and no single distance is the obvious one to monitor.
+`cluster13.py`, `cluster_predict.py`.
+
+### H and the Lindemann parameter detect different transitions
+
+| T0 | Lindemann | H_mean | evaporated |
+|---|---|---|---|
+| 0.50 | 0.084 | 0.097 | 0.0 |
+| 0.70 | **0.188** | 0.107 | 0.0 |
+| 0.90 | 0.298 | 0.178 | 0.3 |
+| 1.10 | 0.284 | 0.305 | 1.0 |
+| 1.60 | 0.439 | 0.495 | 2.3 |
+| 2.00 | 0.503 | 0.697 | 3.7 |
+| 2.50 | **0.506** | **0.753** | 5.0 |
+
+At T0 = 0.70 Lindemann reads 0.188 — melted by the classical 0.1 criterion —
+while H has barely moved from its solid value and nothing has evaporated.
+Lindemann calls the solid-liquid transition; H ignores it. Above T0 = 2.0
+Lindemann saturates (0.503 to 0.506 while evaporation goes 3.7 to 5.0) and H
+continues to resolve.
+
+In the solid regime H is flat at 0.091-0.095 from T0 = 0.05 to 0.40 while
+Lindemann nearly triples. H reads the icosahedral geometry; Lindemann reads
+thermal agitation. They are independent axes.
+
+### As a state variable, the triple-fraction wins
+
+Spearman correlation with cumulative evaporated count, computed **within**
+fixed temperature to remove the confound that both rise with T:
+
+| signal | mean rho | T0=1.6 | T0=2.0 |
+|---|---|---|---|
+| **H_frac** (fraction of triples with H > 0.5) | **0.952** | **0.997** | **0.831** |
+| H_mean | 0.866 | 0.980 | 0.819 |
+| Lindemann | 0.784 | 0.886 | 0.716 |
+| mean pairwise distance | 0.778 | 0.751 | 0.666 |
+| max pairwise distance | 0.727 | 0.646 | 0.534 |
+
+H_frac beats Lindemann and both distance baselines, and the margin widens in
+the heavily evaporating regime where the others degrade. This is the first
+setting in which the H construction outperforms the trivial alternatives, and
+it requires the aggregated form — local H on every triple, globally pooled.
+
+**Caveat, stated plainly:** the correlation is partly definitional. When an
+atom departs, all 66 triples containing it acquire large distance variance, so
+H_frac counts departures in a smooth continuous form rather than inferring
+them independently. A continuous integrity readout is more useful than a step
+function, but it is a measurement, not a prediction. The comparison against
+Lindemann remains fair, since Lindemann is equally distance-derived.
+
+### It does not forecast
+
+Predicting *new* evaporations in a forward window of 8 or 20 time units,
+split-half validated:
+
+| signal | Spearman | R^2 (test) |
+|---|---|---|
+| H_mean | 0.034 | 0.017 |
+| H_p99 | -0.044 | 0.040 |
+| Lindemann | -0.049 | -0.008 |
+| mean distance | -0.032 | 0.043 |
+
+All near zero, for every signal including the baselines. Evaporation in a short
+window is near-Poisson: almost always zero, occasionally one. There is little
+variance to explain and nothing explains it.
+
+The apparent H-versus-evaporation relationship in the temperature table above
+is confounded by temperature driving both. Within a trajectory at fixed T, no
+tested signal forecasts the next departure.
+
+---
+
 ## What does not work
 
 - **Curvature spike.** Frenet curvature of the escaping atom, |v × a|/|v|³.
