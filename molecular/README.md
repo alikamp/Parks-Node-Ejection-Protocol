@@ -853,6 +853,80 @@ run with CK alongside it or the artifact reads as a success.
 
 ---
 
+## 17. The bands are the icosahedron's geometry, not dynamics
+
+Sections 13–16 treated the four H bands as a kinetic system and could not
+make one fit. This is the null hypothesis that should have been tested
+first: what does H look like in the **perfect icosahedron at T = 0**, with no
+dynamics at all? `static_baseline.py`, no simulation required.
+
+### The band structure is already there at absolute zero
+
+286 triples take only **six distinct H values**:
+
+| H | count | fraction | what it is |
+|---|---|---|---|
+| 0.0000 | 120 | 0.420 | |
+| 0.1595 | 60 | 0.210 | |
+| 0.1020 | 40 | 0.140 | equilateral vertex triples (20 faces + 20 larger) |
+| 0.0007 | 30 | 0.105 | centre + edge (30 edges) |
+| 0.1168 | 30 | 0.105 | |
+| 0.2119 | 6 | 0.021 | centre + antipodal pair (6 antipodal pairs) |
+
+### It reproduces the MD occupancies
+
+| | A | B | C | D |
+|---|---|---|---|---|
+| **static, T = 0** | **0.2448** | **0.7552** | **0.0000** | **0.0000** |
+| MD, T0 = 0.50 | 0.2690 | 0.7204 | 0.0106 | 0.0000 |
+| MD, T0 = 1.10 | 0.2525 | 0.5318 | 0.0909 | 0.1248 |
+
+A structure at absolute zero matches the T0 = 0.50 occupancies to within
+0.035. The combinatorics close exactly, so this is not coincidence: contact
+triples number **50 = 20 faces + 30 centre-plus-edge**, and the 6 triples at
+the top H value are **centre plus the 6 antipodal vertex pairs**. Every count
+is a structural quantity of the icosahedron.
+
+### This deflates the three most interesting results above
+
+- **"Mode positions do not move with temperature"** (section 13) — they are
+  fixed by which shells the three atoms come from. Heating only broadens them.
+- **"State A's occupancy is flat across a 2.2× temperature range"** (section
+  13) — it is 0.2448 from pure geometry, and moves by at most 0.034.
+- **"The model is non-Markovian"** (section 14) — the states were never
+  dynamical states. They are **triple types**. A centre-plus-antipodal-pair
+  triple stays that type, so there was no Markov process to find. This is the
+  mechanism behind the failure, not just a restatement of it.
+
+### What survives, and it is sharper than what it replaces
+
+The static maximum is H = 0.2119 and the C band edge is 0.22, so **bands C
+and D contain zero static triples by construction.** Their occupancy is
+thermal excitation with the geometric baseline already subtracted:
+
+| T0 | ΔA | ΔB | ΔC | ΔD | **C + D** |
+|---|---|---|---|---|---|
+| 0.50 | +0.024 | −0.035 | +0.011 | +0.000 | **0.0106** |
+| 0.65 | +0.034 | −0.063 | +0.029 | +0.000 | **0.0292** |
+| 0.80 | +0.029 | −0.113 | +0.051 | +0.034 | **0.0847** |
+| 0.95 | +0.032 | −0.148 | +0.089 | +0.027 | **0.1162** |
+| 1.10 | +0.008 | −0.223 | +0.091 | +0.125 | **0.2157** |
+
+C + D rises monotonically by a factor of 20 and is zero-baselined by
+construction. **That is the state variable** — not the four-state occupancy
+vector, and not H itself. It is close to the H_frac measure of section 6,
+which was the one genuine win of the molecular work, and section 17 explains
+why that one worked while the kinetic elaboration did not: H_frac counts
+thermally excited triples, and the geometric baseline cancels out of it.
+
+### Methodological note
+
+Every band-based result in sections 11–16 should have been checked against
+the static structure before any dynamics were run. The check costs no
+simulation and takes one second.
+
+---
+
 ## Summary of the molecular work
 
 Three statements, all supported:
@@ -863,20 +937,24 @@ Three statements, all supported:
 - **As a precursor, Lindemann beats every H-derived quantity tested** — band
   populations, band transfer rates, spatial domain structure, turning angle,
   and H itself (sections 7, 9, 10, 11).
-- **The H field has discrete, temperature-invariant structure** — four states
-  whose mode positions do not move with temperature, and detailed balance that
-  holds on the reversible ladder to 0.08% while breaking by 59–82% at the
-  ejection step (section 13). Both are direct counts.
+- **The H field's discrete structure is the icosahedron's geometry** — the
+  perfect T = 0 cluster already reproduces the band occupancies to within
+  0.035, so the bands are classes of triple geometry rather than metastable
+  states (section 17). What is left after subtracting that baseline, the
+  C + D occupancy, rises 20-fold with temperature and is the real state
+  variable.
 
 The H construction describes the current state of structural integrity better
 than the standard metric. It does not predict failure better. Those are
 different claims and only the first one is supported here.
 
-The third statement is deliberately narrow. What was built on top of it did
-not hold: the four-state process is not Markovian (section 14), and the
-Arrhenius activation energies are withdrawn as reproducible neither across
-sampling strides nor across seeds (section 15). A second coordinate does not
-fix it, and finer resolution of H outperforms one (section 16).
+The third statement is deliberately narrow, and the kinetic elaboration built
+on it did not hold. The four-state process is not Markovian (section 14); the
+Arrhenius activation energies are withdrawn, reproducible across neither
+sampling strides nor seeds (section 15); a second coordinate does not fix it,
+and finer resolution of H outperforms one (section 16). Section 17 gives the
+reason all of that failed: the states were triple geometries, not basins, so
+there was no kinetics there to find.
 
 ### The limiting problem is statistical, not conceptual
 
