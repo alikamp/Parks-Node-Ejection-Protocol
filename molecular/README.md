@@ -252,6 +252,87 @@ tested signal forecasts the next departure.
 
 ---
 
+## 7. Correlation structure of the H field (underpowered, not refuted)
+
+If the H field over triples had a spatial correlation length, and if that
+length grew on approach to a transition, that would connect the scalar to
+standard critical phenomena rather than leaving it competing with simpler
+baselines. `correlation_structure.py` tests it.
+
+For all 40,755 pairs of the 286 triples: shared-atom count (0, 1, 2),
+centroid separation, and the Pearson correlation of H_i(t) with H_j(t).
+
+| T0 | Lindemann | C(overlap 0, near) | C(overlap 0, far) | xi |
+|---|---|---|---|---|
+| 0.20 | 0.032 | +0.013 | −0.006 | — |
+| 0.40 | 0.049 | +0.014 | −0.010 | — |
+| 0.60 | 0.116 | +0.030 | +0.012 | — |
+| 0.75 | 0.248 | +0.006 | −0.062 | — |
+| 0.90 | 0.330 | −0.001 | −0.070 | — |
+| 1.10 | 0.321 | −0.016 | +0.028 | — |
+| 1.40 | 0.439 | −0.034 | +0.380* | — |
+
+No correlation length is extractable at any temperature: the profile is flat,
+so there is no exponential to fit. Disjoint triples stay within +/-0.034
+across the full range, including through melting at T0 = 0.60.
+
+The one real correlation is between triples sharing **two** atoms
+(C_near = +0.317): those share an edge, so one of the three distances
+entering each variance is the same number. That is arithmetic, not physics.
+Triples sharing one atom or none show nothing.
+
+\* the +0.380 at T0 = 1.40 is an evaporation artifact — a departed atom drives
+every triple containing it to H ~ 1 simultaneously.
+
+**This result is underpowered, not refuting.** An LJ-13 cluster spans 2-3
+sigma. A correlation length requires a system many xi across; here the entire
+object is smaller than the smallest interesting xi, and every triple pair is
+either touching or spanning the cluster, with no intermediate range over which
+decay could appear.
+
+Testing this properly requires a bulk system — several hundred atoms with
+periodic boundaries — where C(r) can be measured over a real range of r and
+xi(T) tracked on approach to the transition. Not attempted here.
+
+---
+
+## 8. Crystallisation: inconclusive by experimental design
+
+`quench.py`. Melt to liquid at T = 0.75 (Lindemann 0.19, no evaporation), then
+Langevin-quench to T = 0.06, 10 runs.
+
+Prediction tested: melting is homogeneous and should move a global average
+smoothly, whereas freezing is nucleation-driven and should leave the mean flat
+while the H *distribution* goes bimodal as an ordered subpopulation separates.
+
+Result: H reaches its solid value at the same instant the potential energy
+says the cluster froze (median lag −0.2, range −0.8 to 0.0). Bimodality is
+flat at 0.532–0.534 throughout and peaks at random times.
+
+But the quench was too fast to test the hypothesis. Freezing completed at
+t = 0.6–5.2 inside a 1600-unit run: the cluster collapsed into the nearest
+minimum without nucleating, so there was no process with a beginning and
+middle to measure a lead or lag against. The right experiment is isothermal
+supercooling near T = 0.25–0.35, where nucleation is slow and stochastic.
+
+Two things did come out of it:
+
+- **H's solid value reproduces from both directions.** Heating gave
+  0.091–0.095; cooling converged to 0.091 from above. The scalar reads a
+  structural property, not a path-dependent artifact.
+- **H flagged a trapped structure.** Run 8 never reached the frozen energy
+  threshold, ending at U = −40.8 against −43.3 for the others — an amorphous
+  local minimum, the known LJ-13 trapping behaviour. Its H was 0.113 against
+  0.091 for the runs that found the ground state.
+
+Note on methodology: the global Q6 bond-orientational parameter is useless as
+ground truth here. Icosahedral symmetry causes near-complete cancellation when
+q6m is averaged over all bonds, so an ordered icosahedron is indistinguishable
+from a disordered cluster. Potential energy against the known LJ-13 global
+minimum (−44.327) was used instead.
+
+---
+
 ## What does not work
 
 - **Curvature spike.** Frenet curvature of the escaping atom, |v × a|/|v|³.
