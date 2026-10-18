@@ -471,6 +471,59 @@ Lindemann is significant at every temperature at p = 0.000.
 
 ---
 
+## 12. Per-trio centroid paths: straighter at higher H
+
+Sections 9-11 treat triples as static objects. This treats each trio as a
+moving unit: track its centroid, measure the turning angle of that centroid's
+path, its straightness (net displacement / path length), and whether trios in
+the same H band share a direction. `trio_paths.py`, 20 seeds per temperature.
+
+| T0 = 0.90 | turn | straight | coherence | coherence (disjoint) |
+|---|---|---|---|---|
+| band 0.00 | 0.555 | 0.945 | 0.139 | 0.209 |
+| band 0.05 | 0.554 | 0.946 | 0.177 | 0.240 |
+| band 0.10 | 0.551 | 0.946 | 0.104 | 0.187 |
+| band 0.20 | 0.555 | 0.945 | 0.277 | 0.272 |
+| band 0.35 | 0.477 | 0.957 | 0.589 | 0.291 |
+| band 0.55 | 0.384 | 0.971 | 0.686 | — |
+
+### Coherence is mostly artifact
+
+Raw coherence rises about tenfold from the low bands to the top (0.07 to
+0.69). Under the disjoint control — restricted to trios sharing no atoms —
+it rises about 1.7-fold (0.17 to 0.29). A real residual survives, consistently
+at all four temperatures, but the dramatic alignment is a departing atom
+dragging the 66 trios that contain it.
+
+Band 0.55 cannot be disjoint-controlled at all: there are never three mutually
+disjoint trios in it. That band *is* one atom's triples, which confirms the
+mechanism directly rather than inferring it.
+
+### Straightness is real, and is not a departing-atom effect
+
+The clean case is T0 = 0.60, where **evaporation is exactly zero** across all
+20 runs — no atom leaves, so no ballistic centroid can explain anything:
+
+| T0 = 0.60 (no evaporation) | turn | straight | population |
+|---|---|---|---|
+| band 0.00 | 0.598 | 0.938 | 0.253 |
+| band 0.10 | 0.587 | 0.940 | 0.518 |
+| band 0.35 | 0.518 | 0.952 | 0.022 |
+
+Trios in band 0.35 — 2.2% of all triples — trace measurably straighter paths
+and turn less than the bulk, inside a cluster that is losing nothing. The
+trend is monotonic across bands and holds at every temperature tested
+(T0 = 0.60, 0.75, 0.90, 1.10).
+
+This is consistent with the turning-angle result of section 10, measured at
+the level of trios rather than atoms: coherent, low-curvature motion
+accompanies high H, and jitter accompanies low H.
+
+Whether straightness *precedes* anything was not tested here; on the evidence
+of sections 7, 9, 10 and 11 the prior should be that it does not.
+
+---
+
 ## Summary of the molecular work
 
 Two sentences, both supported:
