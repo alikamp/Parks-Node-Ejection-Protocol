@@ -15,6 +15,7 @@
 > *Poincaré proved the trajectories are chaotic and uncomputable. What we found is that the geometry at specific moments is neither.*
 
 **Alika M. Parks — Independent Researcher — March 2026**
+> **Support this work:** A single geometric scalar, H = σ²/(1+σ²), predicts when and which body is ejected in chaotic 3- and 4-body systems, cutting compute by ~99% against brute-force integration. If it's useful to you, you can [sponsor me on GitHub](https://github.com/sponsors/alikamp) to help fund ongoing work. Thanks!
 
 ---
 
