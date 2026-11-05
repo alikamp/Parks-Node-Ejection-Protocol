@@ -341,3 +341,103 @@ at two seeds.
 ---
 
 Alika Parks · November 2026
+
+---
+
+## 7. Compute: what the analytic node saves, and what it does not
+
+`compute_cost.py` — force evaluations, 25 systems, dt = 0.004
+
+| task | median | min | max |
+|---|---|---|---|
+| A integrate to the first node | 348 | 34 | 765 |
+| B Newton predictor | **1** | 1 | 1 |
+| C integrate to 150 nodes (classification window) | 55,725 | 6,501 | 64,675 |
+| D integrate to ejection (brute force) | 104,126 | 6,501 | 2,609,501 |
+
+**A/B = 348×** on the first-node task, but **A/C = 0.63%** — that task is well
+under 1% of the classification window. The analytic first node is a genuine
+three-order-of-magnitude saving on something that was never the bottleneck.
+
+**C/D = 55%** on ejecting systems. Reaching enough nodes for a slope costs
+roughly half of simply integrating to the answer.
+
+### On the "~99% below full N-body" claim
+
+The claim as written in `DISCOVERY.md` and the main README is about
+**H-evaluation overhead**: H is evaluated at ~100 privileged moments rather
+than at every timestep. That reproduces exactly — 150 H evaluations against
+55,725 timesteps is 0.27%, a **99.73% reduction**. Correct as stated.
+
+What does *not* follow is the unqualified form ("cutting compute by ~99%
+against brute-force integration"). The integration still has to happen to
+reach the nodes, and C/D = 55% measures that. Same figure, different
+denominator. The qualifier is load-bearing.
+
+---
+
+## 8. Zero-integration classification, and the Mardling-Aarseth benchmark
+
+If the first node alone carried the verdict, the ~55,000 force evaluations
+would collapse to 1. That is the only route to a total-compute claim, so it
+is worth testing properly — against the right benchmark.
+
+**The benchmark is not brute force.** A zero-integration stability criterion
+for hierarchical triples already exists: Mardling & Aarseth 2001, which is the
+`ma01_ratio` that `pnep_v12.py` already computes from a raw state.
+
+**Sampling matters here.** `pnep_v12.make_ic` *selects* systems by MA01 ratio
+(`stable_min=5.0`, `unstable_max=0.45`), so any comparison on that sample is
+rigged in MA01's favour. `zero_integration.py` draws 160 systems unstratified
+— uniform in a_out ∈ [2.5, 8], e_out ∈ [0, 0.6], e_in ∈ [0, 0.3], log-uniform
+m₂ ∈ [0.01, 1], random phase, no MA01 filter — labelled only by integration to
+2000t. 43 of 160 eject (26.9%).
+
+| single feature | AUC | | 5-fold CV | AUC |
+|---|---|---|---|---|
+| `ma01` | **0.982** | | MA01 alone | **0.983 ± 0.007** |
+| `rspread` | 0.755 | | node features only | 0.786 ± 0.047 |
+| `rmax` | 0.755 | | MA01 + node features | 0.956 ± 0.015 |
+| `H0` | 0.753 | | raw orbital elements | 0.974 ± 0.017 |
+| `g_absmax` | 0.628 | | | |
+| `n_closing` | 0.517 | | | |
+
+**MA01 wins and the node features add nothing.** 0.786 against 0.983, and
+combining them is *worse* than MA01 alone (0.956) — eleven weak features
+degrading one strong one at n = 160.
+
+As a hard threshold, which is its intended use:
+
+| | accuracy | ejection recall |
+|---|---|---|
+| MA01 ratio > 0.8 = stable | **92.5%** | **95.3%** |
+| MA01 ratio > 1.0 = stable | 77.5% | 100.0% |
+| PNEP, randomised phases (§6) | 93.0% | 91.7% |
+
+**A closed-form expression from 2001, needing no integration, matches PNEP on
+the classification task.** Survivors are censored at 2000t, so MA01's false
+positives at threshold 1.0 may well eject later — longer integration would
+improve its numbers, not degrade them.
+
+A hypothesis also refuted: that the first node encodes what MA01 captures.
+Node features score 0.786 while the raw elements score 0.974, so the
+instantaneous node geometry carries substantially *less* information than the
+elements. It is not a cheaper route to the same content.
+
+### What follows for positioning
+
+Stable-versus-unstable classification is the weakest claim in the framework to
+lead with, because a one-line formula from 2001 matches it at zero cost. MA01
+answers only "will this survive?" — it gives no ejection **time**, no escaping
+**body**, and no regime structure.
+
+Those are the results with no analytic competitor:
+
+- median 412.6t of warning (slope), or 308.6t with 79% of lifetime remaining
+  (defects, §2)
+- which body leaves, via four independent channels (§5 and the main README)
+- three distinguishable decay regimes
+
+The compute story is likewise not "fewer force evaluations" but **a verdict
+before the event** — which brute-force integration cannot provide at any
+price, since it only knows once it is over.
