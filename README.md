@@ -105,6 +105,35 @@ Ground truth determined by integration to t = 6000 (`verify_revalidation.py`).
 > prediction. Re-running with a 6000-unit window moves them to the ejected
 > class and raises accuracy from 92.0% to 98.9%.
 
+**Scope: these figures are for one family of initial conditions.** `make_ic`
+places all three bodies collinear on the x-axis with velocities in the y–z
+plane, so **r·v = 0 exactly for all three pairs at t = 0** — every trial starts
+with all three pairs simultaneously at a mirror symmetry node. Seven
+quantities are randomised (three masses, a_in, e_in, period ratio, e_out,
+inclination and its sign); all three orbital phases are pinned at apsis.
+
+Re-running the same pipeline with each system advanced by a random fraction of
+its outer period before classification, and nothing else changed
+(`nodes/phase_revalidate2.py`):
+
+| | aligned phases (above) | randomised phases |
+|---|---|---|
+| n | 87 | 86 |
+| Accuracy | 98.9% | **93.0%** |
+| Ejections correctly identified | 100.0% (36/36) | **91.7% (33/36)** |
+| Stable systems correctly identified | 98.0% (50/51) | 94.0% (47/50) |
+| Ejecting systems called stable | 0 | **3** |
+
+The accuracy is robust in kind, losing 5.9 points. The claim that does not
+survive is **zero ejecting systems called stable** — that is a property of the
+aligned configuration, not of the method. H_stable barely moves under
+randomisation (0.805 → 0.787) while H_unstable nearly doubles (0.121 → 0.211),
+compressing the discriminant by 16%: starting every pair at apsis makes an
+unstable geometry unusually clean at early nodes.
+
+**For arbitrary initial conditions the figures to quote are 93.0% accuracy and
+91.7% ejection recall.** See `nodes/` for the full test.
+
 ### 3+1 Hierarchical Quadruple (v13, n=200)
 
 | Metric | Value |
@@ -218,6 +247,22 @@ In the slow-decay regime, the inter-node time interval begins rhythmic oscillati
 
 The physical interpretation: the outer body's orbital period is approaching resonance with the inner binary period. The jitter metric — σ(Δt_node)/mean(Δt_node) over a 12-node rolling window — detects this irregularity while H is still visually flat and the system appears completely stable by every prior method.
 
+> **Threshold correction.** The 0.02 threshold below is wrong by roughly a
+> factor of 30. Consecutive nodes belong to *different* pairs — the three
+> pairwise distances each reach a minimum once per inner-binary period, in
+> strict rotation — so pooling their intervals injects structural variance
+> unrelated to resonance. The resting value of σ/mean in any hierarchical
+> triple is **0.52–0.57**, including a stable control that never loses a body,
+> and an 0.02 alert therefore fires at node 0 in every system tested. The
+> v15.1 reading of 0.611 is baseline, not an anomaly.
+>
+> Pooled jitter does discriminate, at a threshold near **0.60** (AUC 0.956:
+> ejectors 0.5705–0.6443, survivors 0.5613–0.6006). Measuring instead the
+> interval between successive minima of the **same pair** removes the rotation
+> and does better still — AUC 0.972, and the only signal tested whose rank
+> correlation with time-to-ejection reaches significance (ρ = −0.72,
+> p = 0.019). See `nodes/`.
+
 **Validated result (v15.1):**
 System: m = [1.0, 1.0, 0.01], a_in = 1.0, a_out = 4.5, e_in = 0.1, e_out = 0.5
 
@@ -243,6 +288,12 @@ Three independent signals all converge on the same answer:
 1. **Liberation orbit identity** — the body tracing the near-circular anomaly is the ejecting body (100% accuracy at high confidence)
 2. **H-spike velocity trigger** — at the moment of H-spike, the body with the highest relative velocity from the system CoM is the escapee (validated on Burrau)
 3. **Node geometry directional signal** — in final nodes before ejection, one body's pairwise distances grow consistently while others remain stable
+
+A fourth channel, free from data the detector already records: **the ejecting
+body belongs to the least-owned pair** — the pair that triggers fewest nodes.
+6 of 6 in the flash regime, which narrows identity from three candidates to
+two (random would be 2/3 per trial, so p = 0.088 — suggestive rather than
+established). `nodes/flash_partners.py`.
 
 ---
 
@@ -272,6 +323,8 @@ For a survey of 10,000 triple or quadruple systems: hours not months. For galaxy
 | `pnep_v13_3plus1_results.json` | 3+1 validated results, n=200 |
 | `pnep_v14_tight_results.json` | 2+2 validated results, n=120 |
 | `benchmark.py` | Early performance prototype (historical — see frame-dependence note above) |
+| `nodes/` | Which pair owns each node: round-robin defects as a precursor, per-partner jitter, analytic first-node prediction, phase sensitivity of the validation |
+| `molecular/` | Extending H to Lennard-Jones systems: scope, limits, and what transfers |
 
 ---
 
