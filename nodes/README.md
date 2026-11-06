@@ -539,3 +539,66 @@ The headline new result — a round-robin defect as a binary, parameter-free
 ejection precursor — survives the test that cost the published classification
 accuracy 5.9 points, and comes out of it with perfect specificity across
 82,120 survivor nodes.
+
+---
+
+## 10. Is there a closed-form map from the state to H?
+
+Half the chain exists (section 4): `g_P = r_P·v_P`, `ġ_P` exactly, and
+`t*_P ≈ −g_P/ġ_P` give which pair initiates (98.5%) and when (ρ = 0.955) from
+the current state alone.
+
+The other half looks like it should follow. Each distance has an exact second
+derivative at the current instant —
+
+```
+ḋ = g/d          d̈ = ġ/d − g²/d³
+```
+
+— so a second-order expansion gives a closed-form estimate of all three
+distances at the predicted node time, and H = σ²/(1+σ²) follows:
+
+```
+d_Q(t*) ≈ d_Q + (g_Q/d_Q)·t* + ½(ġ_Q/d_Q − g_Q²/d_Q³)·t*²
+```
+
+`state_to_H.py`, 122 randomised-phase states, H_true from integration at the
+true node (H_true range 0.105–0.963, mean 0.754, sd 0.196):
+
+| estimator | MAE | median AE | ρ vs H_true |
+|---|---|---|---|
+| H at t = 0 — do nothing | 0.0169 | 0.0026 | **+0.998** |
+| Taylor at predicted t* | 0.0356 | 0.0014 | +0.879 |
+| Taylor at **true** node time | **0.0078** | 0.0004 | +0.998 |
+
+**The formula is correct.** At the true node time it reaches each distance to
+within 0.4–0.8% (pair 01 0.77%, 12 0.42%, 02 0.64%) and beats the do-nothing
+baseline twofold.
+
+**The timing error destroys it.** Given the Newton-predicted t* instead, the
+same formula is *worse* than doing nothing — 0.0356 against 0.0169. The 22%
+median error in t* propagates into the distances.
+
+**And the result that makes the whole exercise moot: H at the next node is
+essentially H now.** ρ = 0.998, MAE 0.017 on a quantity with sd 0.196. The
+next node is one to three time units away and the distances barely move, so
+the current value already answers the question. A closed-form state→H map buys
+nothing even when it is accurate.
+
+### Why that is the expected answer, in hindsight
+
+Section 3 found H's **level** at AUC 0.522 — useless — while its **slope**
+across many nodes reached 0.778. The predictive content was never in H's value
+at any one node; it is in how H drifts across a hundred of them. A drift over
+150 nodes spanning hundreds of time units is a long-time property of the
+trajectory, and no function of a single instantaneous state can produce one.
+That is not a gap in the derivation. It is what makes the quantity informative.
+
+So the chain is:
+
+- **state → node time and identity** — closed form, validated
+- **node sequence → H slope** — only by integrating
+
+The second step carries the prediction and is irreducibly dynamical. This is
+the same boundary section 7 reached from the compute side and section 8 from
+the Mardling-Aarseth side, arrived at a third way.
