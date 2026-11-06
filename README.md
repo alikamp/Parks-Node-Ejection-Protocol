@@ -281,6 +281,70 @@ is a projection rather than a measured distribution.
 
 ---
 
+## Node Ordering — The Partner Layer
+
+Every node has an **owner**: the pair whose distance reached the local
+minimum. The original model asks what H *is* at the nodes. This asks **which
+pair each node belongs to** — and that ordering carries information H's value
+does not. Full treatment in [`nodes/`](nodes/).
+
+### The three pairs take turns, and the breaks predict ejection
+
+In a stable hierarchical triple the three pairwise distances reach their minima
+in **strict rotation** — equal thirds, never the same pair twice. This is
+kinematic: each distance bottoms out once per inner-binary period, evenly
+spaced. So the rotation itself carries nothing. **Its defects do.**
+
+A **defect** is the same pair owning two consecutive nodes.
+
+| | defects | node events | rate per 1000 | systems with ≥1 |
+|---|---|---|---|---|
+| systems that eject | 28 | 17,257 | 1.623 | 16 / 20 |
+| systems that survive | **0** | **82,120** | **0.000** | **0 / 32** |
+
+Fisher exact **p = 4.7 × 10⁻¹⁰**, odds ratio infinite. Survivors broke the
+rotation **not once in 82,120 consecutive node events**.
+
+- **Binary and parameter-free.** No threshold, no slope fit, no window length.
+  Did the same pair come closest twice running, or not.
+- **Early.** The first defect fires with a median **55% of the system's
+  lifetime still to run**, median absolute lead 294t. The lead *fraction* is
+  uncorrelated with lifetime (ρ = −0.10), so it is scale-free across systems
+  living 200t to 4000t.
+- **Scoped.** 100% sensitivity for disruptions within ~1200t, falling to 43%
+  beyond — every defect-free ejector lives past 1400t.
+- **Survives the test that cost the H classifier 5.9 points.** Measured on
+  randomised orbital phases, where it came out *stronger* than on the aligned
+  initial conditions (`nodes/` section 9).
+
+### The node condition in closed form
+
+A node of pair P occurs exactly where
+
+```
+g_P = r_P · v_P = 0,    with    ġ_P = |v_P|² − μ_P/|r_P| + r_P · T_P > 0
+```
+
+so **which pair initiates is root-finding on the current state**, not a search
+through a trajectory. One Newton step, `t*_P ≈ −g_P/ġ_P`, names the initiating
+pair **98.5%** of the time (chance 33.3%) from a single force evaluation.
+
+**T**_P is the tidal pull of the third body. Drop it — treat each pair as an
+isolated two-body orbit — and pair selection falls to **36.5%**. The ordering
+of closest approaches is therefore *not reducible to pairwise Kepler
+mechanics*: the information lives in the interference from the body not in the
+pair, and the gap is one dot product wide.
+
+### What this layer does not do
+
+H at the next node is essentially H now (ρ = 0.998), so a closed-form
+state→H map buys nothing even when accurate to 0.4% (`nodes/` section 10). And
+locating the first node analytically is a 348× saving on a task that is 0.63%
+of the pipeline. The predictive content is in the node *sequence*, which is
+irreducibly dynamical.
+
+---
+
 ## Identity Prediction — Which Body Ejects
 
 Three independent signals all converge on the same answer:
@@ -289,11 +353,34 @@ Three independent signals all converge on the same answer:
 2. **H-spike velocity trigger** — at the moment of H-spike, the body with the highest relative velocity from the system CoM is the escapee (validated on Burrau)
 3. **Node geometry directional signal** — in final nodes before ejection, one body's pairwise distances grow consistently while others remain stable
 
+> **Scope and two corrections** (`nodes/` section 12). These three channels
+> were only ever evaluated on systems where **"name the lightest body" already
+> scores 96.5%**, and 100% wherever the outer mass is below 0.4 of the inner
+> pair — so 100% accuracy there demonstrates nothing beyond knowing the masses.
+> Burrau does not test it either, being known to eject its lightest body.
+>
+> Retested on 67 disrupting systems with all three masses varied, where the
+> mass prior falls to 47.8%:
+>
+> | channel | first 150 nodes (forecast) | last 20 nodes (identify) |
+> |---|---|---|
+> | mass prior | 47.8% | 47.8% |
+> | **signal 2**, velocity at H-spike | 25.4% | **3.0%** |
+> | signal 3, growing distances | 59.7% | 95.5% |
+> | least-owned pair (below) | **79.1%** | 83.6% |
+>
+> **Signal 2's sign is inverted.** 3.0% against 33% chance — at a high-H node
+> the fastest body is the one at inner periapsis, while the escaper drifts
+> outward *slowly*. As written it is worse than guessing. Signal 3's apparent
+> 12-point gain is not significant (McNemar p = 0.268). Signal 1 is not
+> specified precisely enough here to implement and was not tested.
+
 A fourth channel, free from data the detector already records: **the ejecting
 body belongs to the least-owned pair** — the pair that triggers fewest nodes.
-6 of 6 in the flash regime, which narrows identity from three candidates to
-two (random would be 2/3 per trial, so p = 0.088 — suggestive rather than
-established). `nodes/flash_partners.py`.
+79.1% against a 66.7% chance baseline on varied-mass systems (binomial
+p = 0.018), and 6 of 6 in the flash regime. It narrows identity from three
+candidates to two rather than naming one, and it is the only identity signal
+that beats its own baseline in a forecast window. `nodes/identity_test.py`.
 
 ---
 
