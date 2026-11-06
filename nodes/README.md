@@ -748,3 +748,83 @@ Sources: [Hayashi et al., disruption timescales](https://arxiv.org/html/2207.126
 · [Vynatheya et al., algebraic and ML triple stability](https://academic.oup.com/mnras/article/516/3/4146/6694254)
 · [ML prediction of binary formation](https://www.aanda.org/articles/aa/full_html/2026/09/aa61556-26/aa61556-26.html)
 · [Planar three-body: theory and simulation](https://arxiv.org/html/2608.30414v1)
+
+---
+
+## 12. Identity, tested where the mass prior fails
+
+Section 11 left one question open: the identity channels had only ever been
+evaluated on systems where "name the lightest body" already scores 96.5%.
+`identity_test.py` draws systems with **all three masses varied** (0.5–1.5),
+so the lightest body is not systematically the outer one. 67 disrupting
+systems; the prior falls to **47.8%**, so the test has real work in it.
+Ejected body distribution 13% / 30% / 57%.
+
+Each channel is scored in two windows, because the distinction matters more
+than the channels do:
+
+- **EARLY** — first 150 nodes. A forecast.
+- **LATE** — last 20 nodes before disruption. Identification, after the fact.
+
+Only EARLY can support a predictive claim. The mass prior works from t = 0 at
+no cost, so a trajectory-based channel has to beat it early to justify needing
+the trajectory.
+
+| channel | EARLY | LATE |
+|---|---|---|
+| mass prior (lightest body) | 47.8% | 47.8% |
+| velocity at highest-H node (README ch. 2) | 25.4% | **3.0%** |
+| fastest-growing distances (README ch. 3) | 59.7% | 95.5% |
+| ejector in least-owned pair (section 5) | **79.1%** | 83.6% |
+| majority vote of velocity + growth + mass | 43.3% | — |
+
+### Channel 2 is anti-correlated, not merely weak
+
+3.0% against 33% chance. **The documented sign is inverted.** At a high-H node
+the fastest body relative to the centre of mass is the one at inner periapsis,
+while the escaper drifts outward slowly. As written the rule is far worse than
+guessing, and it pulls the combined vote below the mass prior (43.3% vs
+47.8%). It needs its sign flipped and retesting before it is quoted again.
+
+### Channel 3's gain is not significant
+
+59.7% against 47.8% looks like 12 points, but the correct paired test —
+McNemar on the 67 systems, 24 growth-only correct against 16 mass-only —
+gives **p = 0.268**. At this n it is noise. Its 95.5% in the LATE window is
+identification and close to tautological: by the last 20 nodes the escaper's
+distances are visibly growing because it is leaving.
+
+### The least-owned pair is the only early channel that holds
+
+79.1% against its 66.7% chance baseline (the pair holds two of three bodies),
+binomial **p = 0.0183**. It narrows three candidates to two rather than naming
+one, so it carries less information than a point prediction — but it is the
+only identity signal here that beats its own baseline in the forecast window,
+and it came out of this week's partner analysis rather than the original three
+channels.
+
+### One usable combination
+
+When growth and the mass prior **agree** (19 of 67 systems) accuracy is
+**84.2%**. When they disagree (48 systems) growth gets 50.0% and mass 33.3%.
+Agreement is a real confidence signal even though neither channel is strong on
+its own.
+
+### Standing, revised
+
+**The claim of 100% identity accuracy holds only where the mass prior already
+scores 96.5–100%.** On systems where the prior fails, two of the three
+documented channels do not beat it and one is anti-correlated. Channel 1
+(liberation orbit identity) is not specified precisely enough in this repo to
+implement and was not tested.
+
+So identity does not join the novel list. What survives from section 11 stands
+unchanged:
+
+- **the round-robin defect precursor** — p = 4.7 × 10⁻¹⁰, zero false
+  positives, parameter-free, no prior art found
+- **the analytic node-initiation condition** — 98.5% from one force
+  evaluation, 36.5% without the three-body tidal term
+
+plus, newly, **the least-owned-pair narrowing** at p = 0.018 — a third result
+from the node-ordering layer rather than from H's value.
