@@ -6,9 +6,40 @@ bottomed out. The detector has always recorded this (`node_body` in
 `Parks_NodalBreathing_FrequencyAnalysis.py`) and nothing in the framework
 had ever looked at it.
 
-It turns out to carry a precursor signal, a regime classifier, an identity
-channel, and an analytic way to predict the first node from initial
-conditions without integrating anything.
+It turns out to carry a precursor signal nothing in the literature reports,
+plus a closed-form condition for which pair initiates the nodal sequence.
+
+## What this adds to the H scalar model
+
+The original model asks **what H is** at the nodes. This asks **which pair
+each node belongs to**, and that ordering carries information H's value does
+not:
+
+- **A binary, parameter-free ejection precursor.** In a stable hierarchical
+  triple the three pairwise distances reach their minima in strict rotation —
+  82,120 consecutive node events across surviving systems without one repeat.
+  Systems that go on to eject break it 28 times in 17,257 events. Fisher
+  p = 4.7 × 10⁻¹⁰, zero false positives, no threshold to tune, and the first
+  break fires with a median 55% of the system's lifetime still to run
+  (section 2, confirmed on generic phases in section 9).
+- **The node condition in closed form.** A node is where **r**_P·**v**_P = 0
+  with its derivative positive, so which pair initiates is root-finding on the
+  current state rather than a search through a trajectory. One Newton step
+  names it 98.5% of the time; dropping the three-body tidal term drops that to
+  36.5% against a 33.3% baseline — a measurable statement that node ordering
+  is not reducible to pairwise Kepler mechanics (section 4).
+- **Two corrections to the published method**: the Nodal Breathing threshold
+  is wrong by ~30× (section 3), and the validation initial conditions are
+  degenerate, which costs 5.9 points of accuracy and the zero-miss property
+  when fixed (section 6).
+- **Where the scalar sits against the literature** (section 11): what is
+  matched by existing methods, and what is not.
+
+### Reading order
+
+Sections run 1–11, but three unnumbered blocks — *What does not work*, *Notes
+on repo consistency*, *Scope* — sit between sections 6 and 7 from the order
+they were written in. Sections 7–11 follow them.
 
 ---
 
@@ -602,3 +633,118 @@ So the chain is:
 The second step carries the prediction and is irreducibly dynamical. This is
 the same boundary section 7 reached from the compute side and section 8 from
 the Mardling-Aarseth side, arrived at a third way.
+
+---
+
+## 11. Against the literature: what is matched, and what is not
+
+Sections 8 and 10 showed the node machinery does not beat a 2001 closed-form
+criterion at classification. This benchmarks the other two claims — timing and
+escaping-body identity — against the methods that already exist, and records
+what survives as novel. `timing_benchmark.py`.
+
+### Timing, against the Mushkin-Katz random-walk model
+
+The literature predicts disruption timescales. The cleanest competitor is MK20
+as quoted by Hayashi et al. (arXiv:2207.12672, Eq. 2) — parameter-free:
+
+```
+T_d/P_in = 2 (m123 m12 / (m1 m2))^2 sqrt(1-e_out) (rp_out/a_in)^-2
+           * exp[ (4 sqrt2 / 3) sqrt(m12/m123) (rp_out/a_in)^(3/2) ]
+```
+
+70 random-phase systems, 57 disrupting within 6000t, 32 with a forecast
+window. Two asymmetries declared, both favouring MK20: PNEP's H_target is
+given no value anywhere in this repo and is calibrated here leave-one-out, so
+no system sees its own outcome, while MK20 fits nothing; and PNEP forecasts
+only where dH/dn > 0, so coverage is reported beside accuracy.
+
+Scored as median |log₁₀(predicted/true)| — orders of magnitude, the scale MK20
+operates on.
+
+| estimator | n | med dex | <2× | <10× | ρ |
+|---|---|---|---|---|---|
+| MK20 raw (parameter-free) | 26 | 1.347 | 0.00 | 0.31 | +0.648 |
+| **MK20 fitted, leave-one-out** | 32 | **0.230** | **0.62** | **1.00** | **+0.622** |
+| PNEP, fixed H_target | 26 | 0.284 | 0.50 | 0.92 | +0.490 |
+| PNEP, H_target from window H | 26 | 0.252 | 0.54 | 0.92 | +0.473 |
+| PNEP, H_target from log m₃ | 26 | 0.265 | 0.50 | 0.92 | +0.499 |
+
+Raw MK20 loses badly, but its error is a **pure systematic offset** — all 32
+systems overpredicted, median +1.340 dex, sd 0.473. The model is mis-normalised
+by a constant factor of ~22, which is why Hayashi et al. fit it rather than use
+it raw. Beating the raw form would be beating a strawman.
+
+**Fitted MK20 beats every PNEP variant**: better median error, better rank
+correlation, and 100% coverage against PNEP's 81% — from the orbital elements,
+with no integration at all.
+
+A specification problem surfaced on the way. The Regime 2 formula assumes a
+single H_target, and there is not one: H at the last node before disruption
+ranges **0.365 to 0.995**. It correlates strongly with the outer mass
+(ρ = +0.816, p < 0.0001) and barely with anything measurable in the window
+(window H ρ = +0.152). Predicting it from either closed the gap only
+marginally.
+
+### Identity, against the mass prior
+
+The literature gives ensemble escape probabilities (P_s ∝ L₀², agreeing with
+simulation at the 1% level) but, as its authors state, "does not predict the
+escaper for an individual trajectory." So per-system identity is genuinely
+unoccupied — but the null model is strong:
+
+| outer mass m₃ | n | body 2 ejected |
+|---|---|---|
+| 0.05 – 0.15 | 25 | **100.0%** |
+| 0.15 – 0.40 | 18 | **100.0%** |
+| 0.40 – 0.70 | 6 | 83.3% |
+| 0.70 – 1.00 | 8 | 87.5% |
+| all | 57 | 96.5% |
+
+**"Name the lightest body" scores 96.5%**, and 100% wherever m₃ < 0.4. A 100%
+identity result on hierarchical triples with a light outer body demonstrates
+nothing beyond knowing the masses — and Burrau does not test it either, since
+it is "known to always eject the lightest body."
+
+Identity is only non-trivial above m₃ ≈ 0.4, where the prior falls to 83–87%.
+The four identity channels have not been evaluated there. **Until they are,
+treat identity as unbenchmarked rather than as a result.**
+
+### Standing
+
+| claim | best existing method | this work |
+|---|---|---|
+| stable/unstable classification | MLP 0.95 · updated criterion 0.93 · MA01 0.90 | 0.93 |
+| disruption timing | MK20 fitted, 0.230 dex, 100% coverage | 0.252 dex, 81% coverage |
+| escaping-body identity | mass prior 96.5% | untested where the prior fails |
+| **ejection precursor** | **none found** | **p = 4.7 × 10⁻¹⁰, 0 false positives, parameter-free** |
+| **analytic node initiation** | **none found** | **98.5%, one force evaluation** |
+
+### What is novel
+
+**The round-robin defect precursor** (section 2, section 9). No prior art
+found. The nearest adjacent concept in the literature — "scramble states,"
+bodies approximately equidistant with energy equipartition — is used to
+*classify* chaotic motion, not to forecast it, and rests on phase-space flux
+rather than geometry at closest approach.
+
+**The node-initiation condition and its tidal decomposition** (section 4).
+98.5% pair identity from one force evaluation, falling to 36.5% when the
+three-body tidal term is dropped. A quantitative statement that node ordering
+is not reducible to pairwise Kepler mechanics.
+
+The regime taxonomy (three decay modes with distinct node signatures) is
+supporting structure, not yet benchmarked against literature.
+
+### What this means for how the work is framed
+
+Classification accuracy is the weakest claim to lead with: a one-line 2001
+formula matches it for free, and a neural net beats it. Timing is matched by a
+two-parameter regression needing no integration. What is unoccupied is the
+ordering of closest approaches — a binary precursor with perfect specificity
+and no threshold, and the closed-form condition behind it.
+
+Sources: [Hayashi et al., disruption timescales](https://arxiv.org/html/2207.12672v2)
+· [Vynatheya et al., algebraic and ML triple stability](https://academic.oup.com/mnras/article/516/3/4146/6694254)
+· [ML prediction of binary formation](https://www.aanda.org/articles/aa/full_html/2026/09/aa61556-26/aa61556-26.html)
+· [Planar three-body: theory and simulation](https://arxiv.org/html/2608.30414v1)
