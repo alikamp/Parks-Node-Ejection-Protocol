@@ -125,6 +125,11 @@ forecasts, not hindsight fits. `headtohead.py`, 10 ejectors / 18 censored.
 Per-partner jitter is the best separator tested and the only signal whose
 rank correlation with time-to-ejection reaches significance.
 
+> **Superseded by section 9.** On generic initial phases this reverses:
+> pooled jitter 0.956, per-partner 0.877. The per-partner advantage was an
+> artifact of the aligned initial conditions. The threshold correction below
+> stands; the per-partner decomposition is not needed.
+
 **The 0.02 threshold in the main README is wrong by a factor of ~30.** Pooled
 jitter does discriminate (AUC 0.956) but at a threshold near **0.60**:
 ejectors occupy 0.5705–0.6443 and censored 0.5613–0.6006. At 0.02 the alert
@@ -194,9 +199,14 @@ flash:         5.2 · 5.3 · 12.5 · 33.7 (Burrau) · 45.5 · 48.4 · 50.1
 ```
 
 No overlap. Scramble #2 ran 49.3 / 0.3 / 50.4 with pair (1,2) effectively
-starved. Hierarchical systems never leave 33 ± 3. **Ownership uniformity is a
-regime classifier** reading geometry that the H value does not see. Pooled
-jitter separates regimes too — flash 0.98–1.54 against 0.52–0.57 hierarchical.
+starved. Hierarchical systems never leave 33 ± 3. Ownership uniformity reads
+geometry that the H value does not see. Pooled jitter separates regimes too —
+flash 0.98–1.54 against 0.52–0.57 hierarchical.
+
+> **Weakened by section 9.** On generic initial phases the hierarchical
+> spread runs 1.57–5.64 pp, so the ranges now touch flash's 5.2 lower bound
+> rather than being disjoint. The separation is marginal at the boundary, not
+> clean, and "regime classifier" overstates it.
 
 Burrau validates against the repo: R > 12 gives t = 64.76 ejecting body 0, the
 lightest, at 0.00000% energy drift.
@@ -441,3 +451,91 @@ Those are the results with no analytic competitor:
 The compute story is likewise not "fewer force evaluations" but **a verdict
 before the event** — which brute-force integration cannot provide at any
 price, since it only knows once it is over.
+
+---
+
+## 9. Generic phases: what survives
+
+Every result in sections 1–5 was measured on `hierarchical_ic` states, which
+have r·v = 0 exactly for all three pairs at t = 0 (section 6) — the same
+degeneracy that cost the published validation 5.9 points of accuracy and its
+zero-miss property. `generic_phase.py` reruns the same grid with two random
+phase advances per configuration, tie-break rule matched to the aligned runs
+so the comparison is not confounded by bookkeeping. 52 systems, 20 ejecting,
+32 censored at 4000t. Coincident firings 0.054%.
+
+### Defects: stronger, and now perfectly separating
+
+| | defects | nodes | rate per 1000 | systems with ≥1 |
+|---|---|---|---|---|
+| ejectors | 28 | 17,257 | 1.623 | 16 / 20 |
+| censored | **0** | **82,120** | **0.000** | **0 / 32** |
+
+Fisher exact **p = 4.7 × 10⁻¹⁰** against 1.5 × 10⁻⁵ aligned, odds ratio
+infinite. **Survivors produced zero defects across 82,120 nodes** — the two
+exceptions in the aligned run are gone and specificity is perfect.
+
+The round-robin is *more* inviolable on generic phases, not less: survivor
+switch rate is exactly 1.0000 in **32 of 32** systems, ejectors average 0.9961
+with only 4 of 20 unbroken, Mann-Whitney p = 4.1 × 10⁻⁹.
+
+### Scope: the slow-onset blind spot
+
+| | ejectors | detected | sensitivity |
+|---|---|---|---|
+| t_eject < 1200 | 13 | 13 | **100%** |
+| t_eject ≥ 1200 | 7 | 3 | 43% |
+
+All four defect-free ejectors live past 1400t. The signal is complete for
+ejections inside ~1200t and degrades beyond — the same blind spot dH/dn and
+both jitter metrics show.
+
+### Lead time holds in absolute terms
+
+Median **293.7t** against 308.6t aligned, still uncorrelated with lifetime
+(ρ = −0.103, p = 0.704), so still scale-free. The lead *fraction* falls to
+0.546 from 0.788: 9 of 16 fire with over half the lifetime remaining, but one
+fires at 98.7% through (lead fraction 0.013). Precursor in most cases,
+late-stage indicator in the rest — weaker than the aligned median implied.
+
+### Retraction: pooled jitter beats per-partner jitter
+
+First 150 nodes only, outcome measured afterwards:
+
+| signal | AUC | ρ vs t_eject | p |
+|---|---|---|---|
+| **pooled jitter** | **0.956** | **−0.768** | <0.001 |
+| per-partner jitter | 0.877 | −0.761 | <0.001 |
+| dH/dn | 0.672 | −0.544 | 0.013 |
+
+Aligned had per-partner at 0.972 ahead of pooled at 0.956; generic phases
+reverse it. **The per-partner advantage in section 3 was an aligned-IC
+artifact.** Both metrics still discriminate strongly, and both now carry far
+better rank correlations with time-to-ejection than the aligned per-partner
+figure did (ρ ≈ −0.77 at p < 0.001 against p = 0.019) — so the forecasting
+content is real and does not require the per-partner decomposition.
+
+**The threshold correction is the part that mattered.** Pooled jitter works
+at ~0.60, not the documented 0.02.
+
+dH/dn also weakens, 0.778 → 0.672.
+
+### Summary
+
+| claim | aligned | generic phase | verdict |
+|---|---|---|---|
+| defect rate separation | p = 1.5e-5, 78× | **p = 4.7e-10, 0 false positives** | **stronger** |
+| survivor switch rate exactly 1.0 | 18/18 | **32/32** | **stronger** |
+| defect lead, absolute | 308.6t | 293.7t | holds |
+| defect lead, scale-free | ρ = −0.20 | ρ = −0.10 | holds |
+| defect lead fraction | 0.788 | 0.546 | weaker |
+| defect sensitivity | 11/12 | 16/20 (100% under 1200t) | scoped |
+| pooled jitter threshold ≈ 0.60 | AUC 0.956 | AUC 0.956 | holds |
+| per-partner beats pooled | 0.972 > 0.956 | 0.877 < 0.956 | **retracted** |
+| dH/dn | 0.778 | 0.672 | weaker |
+| ownership uniformity separates regimes | disjoint | ranges touch | weakened |
+
+The headline new result — a round-robin defect as a binary, parameter-free
+ejection precursor — survives the test that cost the published classification
+accuracy 5.9 points, and comes out of it with perfect specificity across
+82,120 survivor nodes.
